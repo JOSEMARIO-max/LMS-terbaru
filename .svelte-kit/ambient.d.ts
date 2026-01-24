@@ -30,7 +30,6 @@ declare module '$env/static/private' {
 	export const ALLUSERSPROFILE: string;
 	export const ANDROID_HOME: string;
 	export const APPDATA: string;
-	export const BUN_WHICH_IGNORE_CWD: string;
 	export const ChocolateyInstall: string;
 	export const ChocolateyLastPathUpdate: string;
 	export const CHROME_CRASHPAD_PIPE_NAME: string;
@@ -52,9 +51,7 @@ declare module '$env/static/private' {
 	export const HOMEPATH: string;
 	export const HOSTNAME: string;
 	export const INFOPATH: string;
-	export const INIT_CWD: string;
 	export const JAVA_HOME: string;
-	export const JOBS: string;
 	export const LANG: string;
 	export const LOCALAPPDATA: string;
 	export const LOGONSERVER: string;
@@ -68,9 +65,13 @@ declare module '$env/static/private' {
 	export const MSYSTEM_CHOST: string;
 	export const MSYSTEM_PREFIX: string;
 	export const NODE: string;
+	export const NODE_ENV: string;
+	export const npm_command: string;
 	export const npm_config_local_prefix: string;
 	export const npm_config_user_agent: string;
 	export const npm_execpath: string;
+	export const npm_lifecycle_event: string;
+	export const npm_lifecycle_script: string;
 	export const npm_node_execpath: string;
 	export const npm_package_json: string;
 	export const npm_package_name: string;
@@ -156,7 +157,6 @@ declare module '$env/dynamic/private' {
 		ALLUSERSPROFILE: string;
 		ANDROID_HOME: string;
 		APPDATA: string;
-		BUN_WHICH_IGNORE_CWD: string;
 		ChocolateyInstall: string;
 		ChocolateyLastPathUpdate: string;
 		CHROME_CRASHPAD_PIPE_NAME: string;
@@ -178,9 +178,7 @@ declare module '$env/dynamic/private' {
 		HOMEPATH: string;
 		HOSTNAME: string;
 		INFOPATH: string;
-		INIT_CWD: string;
 		JAVA_HOME: string;
-		JOBS: string;
 		LANG: string;
 		LOCALAPPDATA: string;
 		LOGONSERVER: string;
@@ -194,9 +192,13 @@ declare module '$env/dynamic/private' {
 		MSYSTEM_CHOST: string;
 		MSYSTEM_PREFIX: string;
 		NODE: string;
+		NODE_ENV: string;
+		npm_command: string;
 		npm_config_local_prefix: string;
 		npm_config_user_agent: string;
 		npm_execpath: string;
+		npm_lifecycle_event: string;
+		npm_lifecycle_script: string;
 		npm_node_execpath: string;
 		npm_package_json: string;
 		npm_package_name: string;
