@@ -1,7 +1,7 @@
 <script>
   import { user } from "$lib/stores";
 
-  // DATA DUMMY (SAMA SEPERTI SEBELUMNYA)
+  // DATA DUMMY
   const watching = [
     { id: 1, title: "Beginner's Guide to Frontend", category: "FRONT END", author: "Leonardo Samsul", img: "https://images.unsplash.com/photo-1587620962725-abab7fe55159?w=400&q=80" },
     { id: 2, title: "Optimizing User Experience", category: "UI/UX DESIGN", author: "Bayu Salto", img: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&q=80" },
@@ -14,10 +14,14 @@
   ];
   const lessons = [{ mentor: "Padhang Satrio", date: "2/16/2026", type: "UI/UX DESIGN", desc: "Understand Of UI/UX Design" }];
 
+  // --- LOGIC NOTIFIKASI (BARU) ---
   let showNotif = false;
+
   const notifications = [
     { id: 1, text: "Lesson 'UI/UX Design' updated", time: "2m ago", unread: true },
     { id: 2, text: "New comment from Mentor Padhang", time: "1h ago", unread: true },
+    { id: 3, text: "Your subscription ends soon", time: "1d ago", unread: false },
+    { id: 4, text: "Welcome to the course!", time: "2d ago", unread: false },
   ];
 
   function toggleNotif() {
@@ -26,109 +30,34 @@
 </script>
 
 <div class="dashboard-grid">
-  <div class="right-col">
-    <div class="right-header">
-      <div class="user-profile">
-        <img src={$user.avatar} alt="u" />
-        <div class="u-info">
-          <span>{$user.name}</span>
-          <small>{$user.role || "Student"}</small>
-        </div>
-      </div>
-
-      <div class="tools-wrapper">
-        <button class="icon-btn">✉️</button>
-        <div class="notif-wrapper">
-          <button class="icon-btn" on:click={toggleNotif}>
-            🔔
-            {#if notifications.some((n) => n.unread)}
-              <span class="red-dot"></span>
-            {/if}
-          </button>
-          {#if showNotif}
-            <div class="notif-popup">
-              <div class="notif-header">
-                <span>Notifications</span>
-                <small>Mark read</small>
-              </div>
-              <div class="notif-list">
-                {#each notifications as n}
-                  <div class="notif-item {n.unread ? 'unread' : ''}">
-                    <div class="n-content">
-                      <p>{n.text}</p>
-                      <span>{n.time}</span>
-                    </div>
-                  </div>
-                {/each}
-              </div>
-            </div>
-          {/if}
-        </div>
-      </div>
-    </div>
-
-    <div class="desktop-widgets">
-      <div class="widget">
-        <div class="widget-head">
-          <h3>Statistic</h3>
-          <span>⋮</span>
-        </div>
-        <div class="circular-chart">
-          <div class="chart-ring">
-            <img src={$user.avatar} alt="me" class="center-face" />
-            <div class="percent-badge">32%</div>
-          </div>
-          <h4 class="greeting">Hi, {$user.name.split(" ")[0]} 🔥</h4>
-          <p class="sub-greet">Keep learning!</p>
-        </div>
-      </div>
-
-      <div class="widget">
-        <div class="widget-head">
-          <h3>Your mentor</h3>
-        </div>
-        <div class="mentor-list">
-          {#each mentors as m}
-            <div class="mentor-row">
-              <img src="https://ui-avatars.com/api/?name={m.name}" alt="m" />
-              <div><strong>{m.name}</strong><small>{m.role}</small></div>
-              <button class="follow-btn">+</button>
-            </div>
-          {/each}
-        </div>
-      </div>
-    </div>
-  </div>
-
   <div class="center-col">
     <div class="search-bar">
       <span>🔍</span>
-      <input type="text" placeholder="Search course..." />
+      <input type="text" placeholder="Search your course..." />
     </div>
 
     <div class="hero-banner">
       <div class="banner-content">
         <small>ONLINE COURSE</small>
-        <h1>Sharpen Your Skills</h1>
+        <h1>Sharpen Your Skills with Professional Online Courses</h1>
         <button class="btn-join">Join Now ➔</button>
       </div>
       <div class="star-decor top">✦</div>
+      <div class="star-decor bottom">✦</div>
     </div>
 
-    <div class="stats-scroll-container">
-      <div class="stats-row">
-        <div class="stat-box">
-          <div class="icon-circle">🎨</div>
-          <div class="stat-info"><strong>2/8</strong><span>UI/UX</span></div>
-        </div>
-        <div class="stat-box">
-          <div class="icon-circle">📢</div>
-          <div class="stat-info"><strong>3/8</strong><span>Branding</span></div>
-        </div>
-        <div class="stat-box">
-          <div class="icon-circle">💻</div>
-          <div class="stat-info"><strong>6/12</strong><span>Front End</span></div>
-        </div>
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="icon-circle">🎨</div>
+        <div class="stat-info"><strong>2/8 Watched</strong><span>UI/UX Design</span></div>
+      </div>
+      <div class="stat-box">
+        <div class="icon-circle">📢</div>
+        <div class="stat-info"><strong>3/8 Watched</strong><span>Branding</span></div>
+      </div>
+      <div class="stat-box">
+        <div class="icon-circle">💻</div>
+        <div class="stat-info"><strong>6/12 Watched</strong><span>Front End</span></div>
       </div>
     </div>
 
@@ -145,6 +74,7 @@
           <div class="card-img" style="background-image: url('{c.img}')">
             <button class="heart-btn" on:click|preventDefault|stopPropagation> ♥ </button>
           </div>
+
           <div class="card-body">
             <span class="tag">{c.category}</span>
             <h4>{c.title}</h4>
@@ -161,28 +91,104 @@
       <h3>Your Lesson</h3>
       <a href="/lesson" class="see-all">See all</a>
     </div>
+    <div class="lesson-table">
+      <div class="t-head"><span>MENTOR</span><span>TYPE</span><span>DESC</span><span>ACTION</span></div>
+      {#each lessons as l}
+        <div class="t-row">
+          <div class="mentor-cell">
+            <img src="https://ui-avatars.com/api/?name={l.mentor}" alt="m" />
+            <div><strong>{l.mentor}</strong><small>{l.date}</small></div>
+          </div>
+          <div><span class="type-badge">{l.type}</span></div>
+          <div class="desc">{l.desc}</div>
+          <div><button class="play-btn">▶</button></div>
+        </div>
+      {/each}
+    </div>
+  </div>
 
-    <div class="table-wrapper">
-      <div class="lesson-table">
-        <div class="t-head"><span>MENTOR</span><span>TYPE</span><span>DESC</span><span>ACTION</span></div>
-        {#each lessons as l}
-          <div class="t-row">
-            <div class="mentor-cell">
-              <img src="https://ui-avatars.com/api/?name={l.mentor}" alt="m" />
-              <div><strong>{l.mentor}</strong><small>{l.date}</small></div>
+  <div class="right-col">
+    <div class="right-header">
+      <button class="icon-btn">✉️</button>
+
+      <div class="notif-wrapper">
+        <button class="icon-btn" on:click={toggleNotif}>
+          🔔
+          {#if notifications.some((n) => n.unread)}
+            <span class="red-dot"></span>
+          {/if}
+        </button>
+
+        {#if showNotif}
+          <div class="notif-popup">
+            <div class="notif-header">
+              <span>Notifications</span>
+              <small>Mark all as read</small>
             </div>
-            <div><span class="type-badge">{l.type}</span></div>
-            <div class="desc">{l.desc}</div>
-            <div><button class="play-btn">▶</button></div>
+            <div class="notif-list">
+              {#each notifications as n}
+                <div class="notif-item {n.unread ? 'unread' : ''}">
+                  <div class="n-icon">{n.unread ? "⚡" : "✨"}</div>
+                  <div class="n-content">
+                    <p>{n.text}</p>
+                    <span>{n.time}</span>
+                  </div>
+                </div>
+              {/each}
+            </div>
+          </div>
+        {/if}
+      </div>
+      <div class="user-profile">
+        <img src={$user.avatar} alt="u" />
+        <span>{$user.name}</span>
+      </div>
+    </div>
+
+    <div class="widget">
+      <div class="widget-head">
+        <h3>Statistic</h3>
+        <span>⋮</span>
+      </div>
+      <div class="circular-chart">
+        <div class="chart-ring">
+          <img src={$user.avatar} alt="me" class="center-face" />
+          <div class="percent-badge">32%</div>
+        </div>
+        <h4 class="greeting">Good Morning {$user.name.split(" ")[0]} 🔥</h4>
+        <p class="sub-greet">Continue your learning!</p>
+      </div>
+
+      <div class="bar-chart">
+        <div class="bar" style="height: 40%"></div>
+        <div class="bar active" style="height: 70%"></div>
+        <div class="bar" style="height: 50%"></div>
+        <div class="bar active-tall" style="height: 100%"></div>
+        <div class="bar" style="height: 30%"></div>
+      </div>
+    </div>
+
+    <div class="widget">
+      <div class="widget-head">
+        <h3>Your mentor</h3>
+        <button class="add-btn">+</button>
+      </div>
+      <div class="mentor-list">
+        {#each mentors as m}
+          <div class="mentor-row">
+            <img src="https://ui-avatars.com/api/?name={m.name}" alt="m" />
+            <div><strong>{m.name}</strong><small>{m.role}</small></div>
+            <button class="follow-btn">+ Follow</button>
           </div>
         {/each}
+        <button class="btn-see-all">See All</button>
       </div>
     </div>
   </div>
 </div>
 
 <style>
-  /* GLOBAL LINK FIX */
+  /* Tambahkan ini agar link card tidak terlihat seperti link text biasa */
   a.course-card {
     text-decoration: none;
     color: inherit;
@@ -193,49 +199,23 @@
   }
   a.course-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 15px 35px rgba(249, 115, 22, 0.15);
+    box-shadow: 0 15px 35px rgba(249, 115, 22, 0.15); /* Orange shadow glow */
   }
-
-  /* --- GRID LAYOUT RESPONSIVE --- */
   .dashboard-grid {
     display: grid;
     grid-template-columns: 1fr 320px;
     gap: 40px;
     height: 100%;
-    overflow-x: hidden;
   }
-
-  /* MEDIA QUERY UTAMA UNTUK TABLET & MOBILE */
-  @media (max-width: 1024px) {
+  @media (max-width: 1100px) {
     .dashboard-grid {
-      grid-template-columns: 1fr; /* Jadi 1 Kolom */
-      gap: 20px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* Pindahkan Right Col ke Atas (Profile & Notif) */
-    .right-col {
-      order: -1;
-    }
-
-    .right-header {
-      justify-content: space-between !important; /* Agar profile kiri, notif kanan */
-      margin-bottom: 20px !important;
-    }
-
-    .desktop-widgets {
-      display: none; /* Sembunyikan widget berat di mobile agar bersih */
-      /* Atau ganti display: block jika ingin tetap tampil di bawah */
+      grid-template-columns: 1fr;
     }
   }
 
-  /* --- CENTER COL --- */
   .center-col {
     padding-bottom: 50px;
-    min-width: 0; /* Fix grid overflow */
   }
-
   .search-bar {
     background: white;
     padding: 12px 20px;
@@ -243,7 +223,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 25px;
+    margin-bottom: 30px;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.02);
   }
   .search-bar input {
@@ -251,9 +231,9 @@
     outline: none;
     width: 100%;
     font-size: 0.95rem;
+    font-family: inherit;
   }
 
-  /* BANNER */
   .hero-banner {
     background: linear-gradient(135deg, #fb923c, #ea580c);
     border-radius: 30px;
@@ -267,7 +247,12 @@
   .banner-content {
     position: relative;
     z-index: 2;
-    max-width: 70%;
+    max-width: 60%;
+  }
+  .hero-banner small {
+    opacity: 0.8;
+    letter-spacing: 1px;
+    font-weight: 600;
   }
   .hero-banner h1 {
     font-size: 2rem;
@@ -283,20 +268,20 @@
     font-weight: 600;
     cursor: pointer;
   }
-
-  @media (max-width: 640px) {
-    .hero-banner {
-      padding: 25px;
-    }
-    .hero-banner h1 {
-      font-size: 1.5rem;
-    }
-    .banner-content {
-      max-width: 100%;
-    }
+  .star-decor {
+    position: absolute;
+    font-size: 4rem;
+    opacity: 0.3;
+  }
+  .top {
+    top: 20px;
+    right: 80px;
+  }
+  .bottom {
+    bottom: -20px;
+    right: 150px;
   }
 
-  /* STATS (Auto fit) */
   .stats-row {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -312,25 +297,6 @@
     gap: 15px;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.02);
   }
-  @media (max-width: 768px) {
-    /* Agar stats bisa di-scroll horizontal di layar kecil */
-    .stats-scroll-container {
-      overflow-x: auto;
-      padding-bottom: 10px;
-      margin: 0 -20px 20px -20px; /* Bleed effect */
-      padding: 0 20px 10px 20px;
-    }
-    .stats-row {
-      display: flex;
-      width: max-content;
-      gap: 15px;
-      margin-bottom: 0;
-    }
-    .stat-box {
-      min-width: 160px;
-    }
-  }
-
   .icon-circle {
     width: 40px;
     height: 40px;
@@ -341,6 +307,7 @@
     color: #f97316;
   }
   .stat-info {
+    flex: 1;
     display: flex;
     flex-direction: column;
   }
@@ -354,7 +321,6 @@
     color: #1f2937;
   }
 
-  /* SECTION HEADER */
   .section-header {
     display: flex;
     justify-content: space-between;
@@ -374,21 +340,19 @@
     background: #e5e7eb;
     cursor: pointer;
     color: #6b7280;
+    font-weight: bold;
   }
   .arrows button.active {
     background: #f97316;
     color: white;
   }
 
-  /* COURSE GRID (Responsive) */
   .course-scroll {
     display: grid;
-    /* Auto fill agar responsif tanpa media query ribet */
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 20px;
     margin-bottom: 30px;
   }
-
   .course-card {
     background: white;
     border-radius: 20px;
@@ -441,14 +405,9 @@
     border-radius: 50%;
   }
 
-  /* TABLE (Scrollable) */
-  .table-wrapper {
-    overflow-x: auto; /* KUNCI RESPONSIVE TABLE */
+  .lesson-table {
     background: white;
     border-radius: 20px;
-  }
-  .lesson-table {
-    min-width: 600px; /* Paksa lebar agar scroll muncul di HP */
     padding: 20px;
   }
   .t-head,
@@ -498,45 +457,12 @@
     justify-content: center;
   }
 
-  /* RIGHT COL (Profile & Widgets) */
   .right-header {
     display: flex;
     justify-content: flex-end;
     align-items: center;
     gap: 15px;
     margin-bottom: 40px;
-  }
-  .user-profile {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-right: auto; /* Push tools to right */
-  }
-  .user-profile img {
-    width: 45px;
-    height: 45px;
-    border-radius: 12px;
-    object-fit: cover;
-  }
-  .u-info {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.2;
-  }
-  .u-info span {
-    font-weight: 700;
-    font-size: 0.95rem;
-    color: #1f2937;
-  }
-  .u-info small {
-    color: #9ca3af;
-    font-size: 0.75rem;
-  }
-
-  .tools-wrapper {
-    display: flex;
-    gap: 10px;
-    align-items: center;
   }
   .icon-btn {
     background: white;
@@ -548,8 +474,20 @@
     font-size: 1.1rem;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
   }
+  .user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  .user-profile img {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    object-fit: cover;
+  }
 
-  /* WIDGETS */
   .widget {
     margin-bottom: 30px;
   }
@@ -593,6 +531,36 @@
     border-radius: 10px;
     transform: rotate(45deg);
   }
+  .greeting {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+  .sub-greet {
+    font-size: 0.8rem;
+    color: #9ca3af;
+    margin: 5px 0 0 0;
+  }
+
+  .bar-chart {
+    height: 100px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding: 0 20px;
+  }
+  .bar {
+    width: 100%;
+    background: #e5e7eb;
+    border-radius: 8px;
+  }
+  .bar.active {
+    background: #fdba74;
+  }
+  .bar.active-tall {
+    background: #f97316;
+  }
 
   .mentor-list {
     background: white;
@@ -615,19 +583,36 @@
   }
   .follow-btn {
     border: none;
-    background: #fff7ed;
+    background: white;
     color: #f97316;
     font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
-    padding: 5px 10px;
-    border-radius: 8px;
+  }
+  .btn-see-all {
+    width: 100%;
+    background: #fff7ed;
+    color: #f97316;
+    border: none;
+    padding: 10px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .add-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid #d1d5db;
+    background: white;
+    cursor: pointer;
   }
 
-  /* NOTIFIKASI */
+  /* --- CSS BARU UNTUK NOTIFIKASI --- */
   .notif-wrapper {
     position: relative;
   }
+
   .red-dot {
     position: absolute;
     top: 8px;
@@ -638,45 +623,99 @@
     border-radius: 50%;
     border: 2px solid white;
   }
+
   .notif-popup {
     position: absolute;
     top: 55px;
     right: 0;
-    width: 300px;
+    width: 320px;
     background: white;
     border-radius: 20px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
     z-index: 100;
     overflow: hidden;
+    animation: slideDown 0.2s ease-out;
     border: 1px solid #f3f4f6;
   }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   .notif-header {
-    padding: 15px;
-    background: #fff7ed;
+    padding: 15px 20px;
+    border-bottom: 1px solid #f3f4f6;
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    background: #fff7ed;
+  }
+  .notif-header span {
     font-weight: 700;
-    font-size: 0.9rem;
+    color: #1f2937;
   }
-  .notif-list {
-    max-height: 250px;
-    overflow-y: auto;
-  }
-  .notif-item {
-    padding: 12px 15px;
-    border-bottom: 1px solid #f9fafb;
-    font-size: 0.85rem;
-  }
-  .notif-item.unread {
-    background: #fffffb;
+  .notif-header small {
+    font-size: 0.75rem;
+    color: #f97316;
+    cursor: pointer;
     font-weight: 600;
   }
 
-  /* MEDIA QUERY NOTIF MOBILE */
-  @media (max-width: 640px) {
-    .notif-popup {
-      right: -50px;
-      width: 280px;
-    } /* Geser agar tidak offscreen */
+  .notif-list {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .notif-item {
+    padding: 15px 20px;
+    display: flex;
+    gap: 12px;
+    border-bottom: 1px solid #f9fafb;
+    transition: background 0.2s;
+    cursor: pointer;
+    text-align: left;
+  }
+  .notif-item:hover {
+    background: #f9fafb;
+  }
+  .notif-item.unread {
+    background: #fffffb;
+  }
+  .notif-item.unread p {
+    font-weight: 600;
+    color: #111827;
+  }
+
+  .n-icon {
+    width: 32px;
+    height: 32px;
+    background: #f3f4f6;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+  }
+  .notif-item.unread .n-icon {
+    background: #ffedd5;
+    color: #f97316;
+  }
+
+  .n-content p {
+    margin: 0 0 4px 0;
+    font-size: 0.85rem;
+    color: #4b5563;
+    line-height: 1.4;
+  }
+  .n-content span {
+    font-size: 0.7rem;
+    color: #9ca3af;
   }
 </style>
