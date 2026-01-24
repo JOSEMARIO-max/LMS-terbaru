@@ -6,6 +6,12 @@
 	"/assignments": [
 		"src/routes/+layout.ts"
 	],
+	"/assignments/[id]": [
+		"src/routes/+layout.ts"
+	],
+	"/class/[id]": [
+		"src/routes/+layout.ts"
+	],
 	"/courses": [
 		"src/routes/+layout.ts"
 	],
@@ -13,6 +19,9 @@
 		"src/routes/+layout.ts"
 	],
 	"/dashboard": [
+		"src/routes/+layout.ts"
+	],
+	"/lesson": [
 		"src/routes/+layout.ts"
 	],
 	"/login": [

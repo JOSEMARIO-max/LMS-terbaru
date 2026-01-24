@@ -27,21 +27,27 @@ export {};
 
 declare module "$app/types" {
 	export interface AppTypes {
-		RouteId(): "/" | "/assignments" | "/courses" | "/courses/[id]" | "/dashboard" | "/login" | "/profile" | "/schedule";
+		RouteId(): "/" | "/assignments" | "/assignments/[id]" | "/class" | "/class/[id]" | "/courses" | "/courses/[id]" | "/dashboard" | "/lesson" | "/login" | "/profile" | "/schedule";
 		RouteParams(): {
+			"/assignments/[id]": { id: string };
+			"/class/[id]": { id: string };
 			"/courses/[id]": { id: string }
 		};
 		LayoutParams(): {
 			"/": { id?: string };
-			"/assignments": Record<string, never>;
+			"/assignments": { id?: string };
+			"/assignments/[id]": { id: string };
+			"/class": { id?: string };
+			"/class/[id]": { id: string };
 			"/courses": { id?: string };
 			"/courses/[id]": { id: string };
 			"/dashboard": Record<string, never>;
+			"/lesson": Record<string, never>;
 			"/login": Record<string, never>;
 			"/profile": Record<string, never>;
 			"/schedule": Record<string, never>
 		};
-		Pathname(): "/" | "/assignments" | "/assignments/" | "/courses" | "/courses/" | `/courses/${string}` & {} | `/courses/${string}/` & {} | "/dashboard" | "/dashboard/" | "/login" | "/login/" | "/profile" | "/profile/" | "/schedule" | "/schedule/";
+		Pathname(): "/" | "/assignments" | "/assignments/" | `/assignments/${string}` & {} | `/assignments/${string}/` & {} | "/class" | "/class/" | `/class/${string}` & {} | `/class/${string}/` & {} | "/courses" | "/courses/" | `/courses/${string}` & {} | `/courses/${string}/` & {} | "/dashboard" | "/dashboard/" | "/lesson" | "/lesson/" | "/login" | "/login/" | "/profile" | "/profile/" | "/schedule" | "/schedule/";
 		ResolvedPathname(): `${"" | `/${string}`}${ReturnType<AppTypes['Pathname']>}`;
 		Asset(): "/foto it.jpg" | "/robots.txt" | string & {};
 	}
