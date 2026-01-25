@@ -18,8 +18,8 @@
   <div class="sticky-wrapper">
     <div class="hidden-content" style="opacity: {splitProgress > 0.6 ? 1 : 0}; transform: scale({0.8 + splitProgress * 0.2});">
       <div class="content-box-cta">
-        <h2>Are you ready to<br />change your career?</h2>
-        <p>Dunia teknologi terus berkembang. Jangan hanya jadi penonton, jadilah pemain utama di era digital ini.</p>
+        <h2>LEVEL UP YOUR SKILL!</h2>
+        <p>Jangan tunggu nanti. Mulai sekarang bersama Khwarizmi Academy</p>
 
         <div class="cta-actions">
           <a href="/login" class="btn-pulse">LOGIN SEKARANG ➔</a>
