@@ -52,26 +52,59 @@
 }
 
 /* --- BRAND / LOGO --- */
+/* Update class .brand agar teks rata tengah secara vertikal */
 .brand {
   display: flex;
   align-items: center;
   gap: 12px;
-  font-weight: 800;
-  font-size: 1.5rem;
-  color: var(--text-dark);
-  user-select: none; /* Agar tidak terblok saat diklik */
+  text-decoration: none; /* Jaga-jaga jika dibungkus anchor */
+  user-select: none;
 }
 
+/* Update .logo-sq untuk menampung Gambar */
 .logo-sq {
-  width: 40px;
-  height: 40px;
-  background: var(--primary-color);
-  border-radius: 10px;
-  display: grid;
-  place-items: center;
-  color: white;
+  width: 50px; /* Ukuran sedikit diperbesar agar proporsional */
+  height: 50px;
+  border-radius: 12px;
+  overflow: hidden; /* Agar gambar mengikuti lengkungan border */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: white; /* Background cadangan jika logo transparan */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  flex-shrink: 0; /* Agar logo tidak gepeng di layar kecil */
+}
+
+/* Style khusus untuk tag IMG di dalam logo */
+.logo-sq img {
+  width: 60%;
+  height: 100%;
+  object-fit: cover; /* Gambar akan mengisi penuh kotak tanpa gepeng */
+  display: block;
+}
+
+/* Wrapper untuk teks agar lebih rapi */
+.brand-text {
+  display: flex;
+  flex-direction: column; /* Menyusun teks atas-bawah */
+  line-height: 1.1; /* Merapatkan jarak antar baris */
+}
+
+/* Style untuk kata "Khwarizmi" */
+.text-primary {
+  font-weight: 800;
   font-size: 1.2rem;
-  box-shadow: 0 4px 6px -1px rgba(249, 115, 22, 0.2);
+  color: var(--text-dark);
+  letter-spacing: -0.5px;
+}
+
+/* Style untuk kata "Academy" */
+.text-secondary {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--primary); /* Warna oranye agar kontras */
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 /* --- NAVIGATION LINKS (DESKTOP) --- */

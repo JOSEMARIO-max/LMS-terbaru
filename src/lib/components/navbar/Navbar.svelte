@@ -12,8 +12,13 @@
 <nav class="navbar">
   <div class="container nav-wrapper">
     <div class="brand">
-      <div class="logo-sq">LMS</div>
-      <span>Khwarizmi.</span>
+      <div class="logo-sq">
+        <img src="/logo.jpg" alt="Khwarizmi Academy Logo" />
+      </div>
+      <div class="brand-text">
+        <span class="text-primary">Khwarizmi</span>
+        <span class="text-secondary">Academy</span>
+      </div>
     </div>
 
     <div class="nav-links">

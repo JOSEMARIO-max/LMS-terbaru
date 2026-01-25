@@ -11,14 +11,18 @@
   import CallToAction from "$lib/components/landing/CallToAction.svelte";
   import Footer from "$lib/components/landing/Footer.svelte";
 
-  // Import CSS Halaman Utama (Tetap di sini agar ter-apply ke semua child component)
+  // Import CSS Halaman Utama
   import "./landing.css";
 </script>
+
+<svelte:head>
+  <title>Landing Page - Khwarizmi Academy</title>
+  <meta name="description" content="Platform belajar IT terbaik di Indonesia" />
+</svelte:head>
 
 <div class="landing-page">
   <Navbar />
   <Hero />
-  <!-- <Partners /> -->
   <Categories />
   <Features />
   <Pricing />
