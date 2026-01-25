@@ -1,9 +1,9 @@
-<script>
+<script lang="ts">
   let y = 0;
-  let splitContainer;
+  let splitContainer: HTMLElement | null = null;
   let splitProgress = 0;
 
-  // Reactive statement untuk menghitung progress scroll
+  // Reactive statement
   $: if (splitContainer) {
     const start = splitContainer.offsetTop;
     const distance = splitContainer.offsetHeight - window.innerHeight;

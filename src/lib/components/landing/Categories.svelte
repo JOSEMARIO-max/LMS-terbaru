@@ -1,7 +1,18 @@
-<script>
+<script lang="ts">
   import { fade, scale } from "svelte/transition";
 
-  const categories = [
+  // ===== TYPE =====
+  type Category = {
+    name: string;
+    count: string;
+    icon: string;
+    img: string;
+    description: string;
+    topics: string[];
+  };
+
+  // ===== DATA =====
+  const categories: Category[] = [
     {
       name: "IT Academy (COMING SOON)",
       count: "10+ Kelas",
@@ -26,11 +37,21 @@
       description: "Ubah skill jadi sumber penghasilan! Ini saatnya belajar jadi freelancer bersama para expert di berbagai bidang.",
       topics: ["Building Portfolio", "Client Negotiation", "Personal Branding", "Networking Strategy", "Contract & Invoicing"],
     },
+    {
+      name: "Islamic IT Course for Kids",
+      count: "6+ Program",
+      icon: "🚀",
+      img: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&q=80",
+      description: "Kelas kursus persembahan Khwarizmi yang menggabungkan pembelajaran teknologi modern dengan nilai-nilai Islam.",
+      topics: ["Office for Kids", "Coding for Kids", "AI for Kids", "Game Developer", "Islamic Creative Writing", "GCLWAMA"],
+    },
   ];
 
-  let selectedCategory = null;
+  // ===== STATE =====
+  let selectedCategory: Category | null = null;
 
-  function openModal(cat) {
+  // ===== ACTION =====
+  function openModal(cat: Category) {
     selectedCategory = cat;
     document.body.style.overflow = "hidden";
   }
@@ -83,7 +104,10 @@
         </div>
 
         <div class="modal-body">
-          <p class="modal-desc">{selectedCategory.description}</p>
+          <p class="modal-desc">
+            {selectedCategory.description}
+          </p>
+
           <div class="modal-topics">
             <h4>Apa yang akan dipelajari:</h4>
             <ul>
@@ -92,7 +116,8 @@
               {/each}
             </ul>
           </div>
-          <a href="/login" class="btn-modal-action">Daftar Kelas Ini Sekarang</a>
+
+          <a href="/login" class="btn-modal-action"> Daftar Kelas Ini Sekarang </a>
         </div>
       </div>
     </div>
