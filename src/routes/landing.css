@@ -1158,6 +1158,13 @@ a {
   align-items: center;
 }
 
+.text-primary-footer {
+  font-weight: 800;
+  font-size: 1.2rem;
+  color: #ffff;
+  letter-spacing: -0.5px;
+}
+
 .legal-links {
   display: flex;
   gap: 30px;

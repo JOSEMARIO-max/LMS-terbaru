@@ -3,8 +3,13 @@
     <div class="footer-top">
       <div class="f-brand-box">
         <div class="brand text-white">
-          <div class="logo-sq">Al</div>
-          <span>Khwarizmi.</span>
+          <div class="logo-sq">
+            <img src="/logo.jpg" alt="Khwarizmi Academy Logo" />
+          </div>
+          <div class="brand-text">
+            <span class="text-primary-footer">Khwarizmi</span>
+            <span class="text-secondary">Academy</span>
+          </div>
         </div>
         <p class="f-desc">Platform edukasi teknologi no.1 di Indonesia. Kami membantu kamu beralih karir ke dunia digital dengan kurikulum praktis dan mentor ahli.</p>
         <div class="f-socials">
