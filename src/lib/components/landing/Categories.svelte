@@ -169,35 +169,38 @@
   .main-wrapper {
     display: flex;
     justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    padding: 20px;
+    /* PERUBAHAN: Mulai dari atas (start) dan hapus min-height 100vh agar tidak memakan satu layar penuh */
+    align-items: flex-start;
+    min-height: auto; 
+    /* PERUBAHAN: Atur jarak atas (40px) dan bawah (20px) agar lebih rapat dengan section lain */
+    padding: 40px 20px 20px 20px;
     box-sizing: border-box;
   }
 
   .content-container {
     width: 100%;
-    max-width: 1280px; /* Lebar ditambah agar muat 4 kartu */
+    max-width: 1280px;
   }
 
   /* --- HEADER --- */
   .header {
     text-align: center;
-    margin-bottom: 40px;
+    /* PERUBAHAN: Kurangi margin bawah agar konten lebih dekat ke judul */
+    margin-bottom: 24px;
   }
   .pill {
     font-size: 0.7rem;
     font-weight: 700;
     letter-spacing: 1px;
     background: white;
-    padding: 5px 12px;
+    padding: 4px 12px;
     border-radius: 20px;
     border: 1px solid #e2e8f0;
     color: var(--text-muted);
   }
   h1 {
-    font-size: 2.2rem;
-    margin: 15px 0 5px;
+    font-size: 2rem;
+    margin: 10px 0 5px;
     font-weight: 800;
   }
   .gradient-text {
@@ -211,16 +214,14 @@
     font-size: 0.9rem;
   }
 
-  /* --- GRID 4 KOLOM (INTI PERUBAHAN) --- */
+  /* --- GRID --- */
   .card-grid {
     display: grid;
-    /* PENTING: repeat(4, 1fr) memaksa 4 kolom sejajar */
     grid-template-columns: repeat(4, 1fr);
     gap: 20px;
     width: 100%;
   }
 
-  /* Responsive: Di bawah 1024px jadi 2 kolom, di HP jadi 1 kolom */
   @media (max-width: 1024px) {
     .card-grid {
       grid-template-columns: repeat(2, 1fr);
@@ -244,7 +245,7 @@
     transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
-    height: 240px; /* Tinggi seragam */
+    height: 220px; /* Sedikit dipendekkan */
     justify-content: space-between;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     overflow: hidden;
@@ -255,206 +256,41 @@
     box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.1);
   }
 
-  /* Card Themes */
-  .card.teal .icon-wrapper {
-    background: var(--teal-bg);
-    color: var(--teal-dark);
-  }
-  .card.teal:hover {
-    border-color: var(--teal);
-  }
-  .card.teal .arrow-icon {
-    color: var(--teal);
-  }
+  /* Theme colors (sama seperti sebelumnya) */
+  .card.teal .icon-wrapper { background: var(--teal-bg); color: var(--teal-dark); }
+  .card.teal:hover { border-color: var(--teal); }
+  .card.teal .arrow-icon { color: var(--teal); }
+  .card.orange .icon-wrapper { background: var(--orange-bg); color: var(--orange-dark); }
+  .card.orange:hover { border-color: var(--orange); }
+  .card.orange .arrow-icon { color: var(--orange); }
 
-  .card.orange .icon-wrapper {
-    background: var(--orange-bg);
-    color: var(--orange-dark);
-  }
-  .card.orange:hover {
-    border-color: var(--orange);
-  }
-  .card.orange .arrow-icon {
-    color: var(--orange);
-  }
+  .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .icon-wrapper { width: 45px; height: 45px; border-radius: 12px; display: grid; place-items: center; font-size: 1.4rem; }
+  .arrow-icon { font-size: 1.1rem; opacity: 0; transform: translate(-5px, 5px); transition: 0.3s; }
+  .card:hover .arrow-icon { opacity: 1; transform: translate(0, 0); }
+  .card-content h2 { font-size: 1.05rem; font-weight: 700; margin: 0 0 6px; color: var(--text); }
+  .card-content p { font-size: 0.8rem; color: var(--text-muted); margin: 0; line-height: 1.4; }
 
-  /* Inner Card */
-  .card-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-  }
-
-  .icon-wrapper {
-    width: 50px;
-    height: 50px;
-    border-radius: 14px;
-    display: grid;
-    place-items: center;
-    font-size: 1.6rem;
-  }
-
-  .arrow-icon {
-    font-size: 1.2rem;
-    opacity: 0;
-    transform: translate(-5px, 5px);
-    transition: 0.3s;
-  }
-  .card:hover .arrow-icon {
-    opacity: 1;
-    transform: translate(0, 0);
-  }
-
-  .card-content h2 {
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin: 0 0 8px;
-    color: var(--text);
-  }
-  .card-content p {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    margin: 0;
-    line-height: 1.4;
-  }
-
-  /* --- MODAL STYLES --- */
-  .modal-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(5px);
-    z-index: 100;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-  }
-
-  .modal-window {
-    background: white;
-    width: 100%;
-    max-width: 550px;
-    max-height: 80vh;
-    border-radius: 24px;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    overflow: hidden;
-  }
-
-  .modal-header {
-    padding: 25px;
-    display: flex;
-    gap: 20px;
-    align-items: flex-start;
-    border-bottom: 1px solid #f1f5f9;
-  }
-  .modal-window.teal .modal-header {
-    background: linear-gradient(to right, #f0fdfa, white);
-  }
-  .modal-window.orange .modal-header {
-    background: linear-gradient(to right, #fff7ed, white);
-  }
-
-  .modal-icon-large {
-    font-size: 2.2rem;
-  }
-  .modal-header h3 {
-    margin: 0;
-    font-size: 1.4rem;
-    font-weight: 800;
-  }
-  .modal-subtitle {
-    margin: 5px 0 0;
-    font-size: 0.85rem;
-    color: var(--text-muted);
-  }
-
-  .close-btn {
-    position: absolute;
-    right: 20px;
-    top: 20px;
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
-    color: #94a3b8;
-  }
-
-  .modal-body {
-    padding: 25px;
-    overflow-y: auto;
-  }
-
-  .program-row {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 20px;
-  }
-  .program-number {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: #f1f5f9;
-    color: var(--text-muted);
-    font-size: 0.75rem;
-    font-weight: 700;
-    display: grid;
-    place-items: center;
-    flex-shrink: 0;
-    margin-top: 2px;
-  }
-  .modal-window.teal .program-number {
-    background: var(--teal-bg);
-    color: var(--teal-dark);
-  }
-  .modal-window.orange .program-number {
-    background: var(--orange-bg);
-    color: var(--orange-dark);
-  }
-
-  .program-info h4 {
-    margin: 0 0 8px;
-    font-size: 0.95rem;
-  }
-  .tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-  .tags span {
-    font-size: 0.7rem;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    padding: 3px 8px;
-    border-radius: 6px;
-  }
-
-  .modal-footer {
-    padding: 20px 25px;
-    border-top: 1px solid #f1f5f9;
-    text-align: right;
-  }
-  .cta-btn {
-    padding: 10px 24px;
-    border: none;
-    border-radius: 10px;
-    color: white;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.2s;
-  }
-  .modal-window.teal .cta-btn {
-    background: var(--teal);
-  }
-  .modal-window.teal .cta-btn:hover {
-    background: var(--teal-dark);
-  }
-  .modal-window.orange .cta-btn {
-    background: var(--orange);
-  }
-  .modal-window.orange .cta-btn:hover {
-    background: var(--orange-dark);
-  }
+  /* --- MODAL STYLES (Tetap sama) --- */
+  .modal-backdrop { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(5px); z-index: 100; display: flex; justify-content: center; align-items: center; padding: 20px; }
+  .modal-window { background: white; width: 100%; max-width: 550px; max-height: 80vh; border-radius: 24px; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); overflow: hidden; position: relative;}
+  .modal-header { padding: 25px; display: flex; gap: 20px; align-items: flex-start; border-bottom: 1px solid #f1f5f9; }
+  .modal-window.teal .modal-header { background: linear-gradient(to right, #f0fdfa, white); }
+  .modal-window.orange .modal-header { background: linear-gradient(to right, #fff7ed, white); }
+  .modal-icon-large { font-size: 2.2rem; }
+  .modal-header h3 { margin: 0; font-size: 1.4rem; font-weight: 800; }
+  .modal-subtitle { margin: 5px 0 0; font-size: 0.85rem; color: var(--text-muted); }
+  .close-btn { position: absolute; right: 20px; top: 20px; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #94a3b8; }
+  .modal-body { padding: 25px; overflow-y: auto; }
+  .program-row { display: flex; gap: 15px; margin-bottom: 20px; }
+  .program-number { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; font-size: 0.75rem; font-weight: 700; }
+  .modal-window.teal .program-number { background: var(--teal-bg); color: var(--teal-dark); }
+  .modal-window.orange .program-number { background: var(--orange-bg); color: var(--orange-dark); }
+  .program-info h4 { margin: 0 0 8px; font-size: 0.95rem; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tags span { font-size: 0.7rem; background: #f8fafc; border: 1px solid #e2e8f0; padding: 3px 8px; border-radius: 6px; }
+  .modal-footer { padding: 20px 25px; border-top: 1px solid #f1f5f9; text-align: right; }
+  .cta-btn { padding: 10px 24px; border: none; border-radius: 10px; color: white; font-weight: 600; cursor: pointer; transition: 0.2s; }
+  .modal-window.teal .cta-btn { background: var(--teal); }
+  .modal-window.orange .cta-btn { background: var(--orange); }
 </style>
