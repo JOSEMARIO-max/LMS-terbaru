@@ -1,7 +1,7 @@
 <script>
   import { onMount } from "svelte";
 
-  const words = ["Web Development", "UI/UX", "Animation", "Videography", "Frontend Development", "Backend Development"];
+  const words = ["Web Development", "UI/UX DESIGN", "Animation", "Videography", "Frontend Development", "Backend Development"];
   let currentText = "";
   let wordIndex = 0;
   let isDeleting = false;
@@ -48,7 +48,7 @@
       <p>Ini waktunya untuk mulai belajar, naikin level, dan jadi lebih siap untuk masa depan.</p>
       <div class="hero-btns">
         <a href="/login" class="btn-primary">Mulai Belajar Sekarang</a>
-        <button class="btn-secondary"><span class="play-icon">▶</span> Tonton Demo</button>
+        <button class="btn-secondary"><span class="play-icon">▶</span> Eksplorasi</button>
       </div>
       <!-- <div class="trust-proof">
         <div class="avatar-group">
