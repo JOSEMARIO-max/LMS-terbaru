@@ -70,7 +70,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: white; /* Background cadangan jika logo transparan */
+  background: transparent; /* Background cadangan jika logo transparan */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   flex-shrink: 0; /* Agar logo tidak gepeng di layar kecil */
 }
@@ -81,6 +81,7 @@
   height: 100%;
   object-fit: cover; /* Gambar akan mengisi penuh kotak tanpa gepeng */
   display: block;
+  background: transparent;
 }
 
 /* Wrapper untuk teks agar lebih rapi */

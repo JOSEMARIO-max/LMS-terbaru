@@ -1,7 +1,7 @@
 <section class="features" id="features">
   <div class="container">
-    <div class="section-head">
-      <h2>KENAPA HARUS KHWARIZMI ACADEMY?</h2>
+    <div class="section-head gradient-style">
+      <h2>KENAPA HARUS <span>KHWARIZMI ACADEMY?</span></h2>
       <p>Kami merancang metode belajar yang efektif untuk membantu karirmu.</p>
     </div>
 

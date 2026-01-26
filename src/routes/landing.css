@@ -9,6 +9,10 @@
   --text-gray: #6b7280;
   --bg-light: #fafafa;
   --white: #ffffff;
+  --kh-orange: #f67d26;
+  --kh-teal: #009b84;
+  --kh-dark: #0c2e28; /* Warna teks gelap pengganti hitam */
+  --kh-gray: #5a736f; /* Warna teks paragraf */
 }
 
 :global(html) {
@@ -308,6 +312,34 @@ a {
 .section-head p {
   font-size: 1.1rem;
   color: var(--text-gray);
+}
+.section-head.gradient-style {
+  text-align: center;
+  max-width: 650px;
+  margin: 60px auto; /* Menambah margin atas agar tidak terlalu mepet */
+}
+
+.section-head.gradient-style h2 {
+  font-size: 2.8rem; /* Sedikit diperbesar */
+  font-weight: 700;
+  color: var(--kh-dark);
+  margin-bottom: 15px;
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+}
+
+/* Menerapkan gradasi pada teks Khwarizmi Academy */
+.section-head.gradient-style h2 span {
+  background: linear-gradient(90deg, var(--kh-teal), var(--kh-orange));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block; /* Penting agar gradasi utuh */
+}
+
+.section-head.gradient-style p {
+  font-size: 1.15rem;
+  color: var(--kh-gray);
+  line-height: 1.6;
 }
 
 .cat-grid {
