@@ -1,463 +1,317 @@
 <script>
-  // --- DATA DUMMY ---
-  const allLessons = [
-    {
-      id: 1,
-      title: "Mastering Mobile App Design",
-      mentor: "Padhang Satrio",
-      total: 24,
-      done: 18,
-      img: "https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&q=80",
-      status: "active",
-      last_watched: "2 hours ago",
+  import { user, ownedCourses } from "$lib/stores";
+  import { fly, fade } from "svelte/transition";
+
+  // DATA KURSUS
+  const allCourses = [
+    { 
+      id: 1, title: "Mastering Mobile App Design", category: "Design", author: "Padhang Satrio", totalMateri: 24, 
+      img: "https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&q=80" 
     },
-    {
-      id: 2,
-      title: "HTML & CSS for Beginners",
-      mentor: "Leonardo Samsul",
-      total: 12,
-      done: 12,
-      img: "https://images.unsplash.com/photo-1587620962725-abab7fe55159?w=400&q=80",
-      status: "completed",
-      completed_date: "12 Jan 2026",
+    { 
+      id: 2, title: "Fullstack Web Developer", category: "Development", author: "Leonardo Samsul", totalMateri: 45, 
+      img: "https://images.unsplash.com/photo-1587620962725-abab7fe55159?w=400&q=80" 
     },
-    {
-      id: 3,
-      title: "Advanced Brand Identity",
-      mentor: "Bayu Salto",
-      total: 20,
-      done: 5,
-      img: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=400&q=80",
-      status: "active",
-      last_watched: "1 day ago",
+    { 
+      id: 3, title: "Advanced Brand Identity", category: "Design", author: "Bayu Salto", totalMateri: 20, 
+      img: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=400&q=80" 
     },
-    {
-      id: 4,
-      title: "React JS Fundamental",
-      mentor: "Bagas Mahpie",
-      total: 25,
-      done: 0,
-      img: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400&q=80",
-      status: "saved",
-      last_watched: "-",
+    { 
+      id: 4, title: "Python for Data Science", category: "Data", author: "Sarah Vi", totalMateri: 60, 
+      img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80" 
     },
-    {
-      id: 5,
-      title: "Digital Marketing 101",
-      mentor: "Sarah Vi",
-      total: 10,
-      done: 10,
-      img: "https://images.unsplash.com/photo-1533750516457-a7f992034fec?w=400&q=80",
-      status: "completed",
-      completed_date: "20 Dec 2025",
+    { 
+      id: 5, title: "Digital Marketing Mastery", category: "Marketing", author: "Kevin H.", totalMateri: 30, 
+      img: "https://images.unsplash.com/photo-1533750516457-a7f992034fec?w=400&q=80" 
     },
+    { 
+      id: 6, title: "3D Modeling with Blender", category: "Design", author: "Dian Sastro", totalMateri: 25, 
+      img: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=400&q=80" 
+    },
+    { 
+      id: 7, title: "Copywriting that Sells", category: "Marketing", author: "Andi Penulis", totalMateri: 15, 
+      img: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=400&q=80" 
+    },
+    { 
+      id: 8, title: "Flutter Mobile Dev", category: "Development", author: "Rizky K.", totalMateri: 50, 
+      img: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=400&q=80" 
+    }
   ];
 
-  // --- SVELTE 5 STATE (RUNES) ---
-  let activeTab = $state("active");
-  let searchQuery = $state("");
-
-  // --- DERIVED STATE ---
-  let filteredLessons = $derived(
-    allLessons.filter((l) => {
-      const tabMatch = activeTab === "all" ? true : l.status === activeTab;
-      const searchMatch = l.title.toLowerCase().includes(searchQuery.toLowerCase());
-      return tabMatch && searchMatch;
-    }),
-  );
-
-  function getProgress(done, total) {
-    return Math.round((done / total) * 100);
-  }
+  // LOGIC FILTER
+  $: myLessons = allCourses.filter(c => $ownedCourses.includes(c.id));
 </script>
 
 <div class="page-container">
-  <div class="header-section">
-    <div class="title-group">
-      <h1>My Learning</h1>
-      <p class="subtitle">Track your progress and achievements.</p>
-    </div>
-
-    <div class="search-wrap">
-      <span class="search-icon">🔍</span>
-      <input type="text" placeholder="Search courses..." bind:value={searchQuery} />
-    </div>
+  <div class="header">
+    <div class="pill-label">🎓 DASHBOARD SISWA</div>
+    <h1>Selamat Datang, <span class="highlight">{$user.name}</span>!</h1>
+    <p>
+      {#if myLessons.length > 0}
+        Lanjutkan progres belajarmu dan raih target hari ini.
+      {:else}
+        Akun kamu belum memiliki kelas aktif.
+      {/if}
+    </p>
   </div>
 
-  <div class="stats-row">
-    <div class="stat-card">
-      <div class="stat-icon orange">🔥</div>
-      <div>
-        <span class="stat-val">2</span>
-        <span class="stat-label">In Progress</span>
+  {#if myLessons.length === 0}
+    
+    <div class="empty-state" in:fly={{ y: 20 }}>
+      <div class="icon-bg">
+        <div class="lock-icon">🔒</div>
+      </div>
+      <h3>Akses Terkunci</h3>
+      <p>
+        Kamu belum membeli kelas apapun.<br>
+        Silakan beli kursus untuk membuka materi belajar.
+      </p>
+      <div class="btn-group">
+        <a href="/courses" class="btn-primary">Beli Kelas Sekarang</a>
+        <a href="/profile" class="btn-outline">Cek Langganan</a>
       </div>
     </div>
-    <div class="stat-card">
-      <div class="stat-icon green">✅</div>
-      <div>
-        <span class="stat-val">14</span>
-        <span class="stat-label">Completed</span>
-      </div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon blue">⏱️</div>
-      <div>
-        <span class="stat-val">85h</span>
-        <span class="stat-label">Hours Spent</span>
-      </div>
-    </div>
-  </div>
 
-  <div class="tabs-container">
-    <button class:active={activeTab === "active"} onclick={() => (activeTab = "active")}>In Progress</button>
-    <button class:active={activeTab === "completed"} onclick={() => (activeTab = "completed")}>Completed</button>
-    <button class:active={activeTab === "saved"} onclick={() => (activeTab = "saved")}>Saved</button>
-  </div>
-
-  <div class="lesson-grid">
-    {#if filteredLessons.length === 0}
-      <div class="empty-state">
-        <div class="empty-icon">📂</div>
-        <h3>No courses found</h3>
-        <p>Try changing the filter or search keyword.</p>
-      </div>
-    {:else}
-      {#each filteredLessons as item}
-        <div class="lesson-card">
-          <div class="card-thumb" style="background-image: url('{item.img}')">
-            {#if item.status === "completed"}
-              <div class="badge-done">Completed</div>
-            {/if}
-            <div class="overlay"></div>
+  {:else}
+    
+    <div class="grid-container">
+      {#each myLessons as lesson (lesson.id)}
+        <div class="course-card" in:fly={{ y: 20, duration: 400 }}>
+          
+          <div class="card-image" style="background-image: url('{lesson.img}')">
+            <div class="play-overlay">
+              <div class="play-btn">▶</div>
+            </div>
+            <div class="category-badge">{lesson.category}</div>
           </div>
 
           <div class="card-body">
-            <div>
-              <small class="mentor-text">By {item.mentor}</small>
-              <h3 class="card-title">{item.title}</h3>
-            </div>
-
+            <h3 class="course-title">{lesson.title}</h3>
+            <p class="mentor-name">Mentor: <strong>{lesson.author}</strong></p>
+            
             <div class="progress-section">
-              <div class="p-header">
-                <span>Progress</span>
-                <span class="p-percent">{getProgress(item.done, item.total)}%</span>
+              <div class="progress-info">
+                <span>Progress Belajar</span>
+                <span class="percent">0%</span>
               </div>
-              <div class="p-track">
-                <div class="p-fill {item.status === 'completed' ? 'green' : ''}" style="width: {getProgress(item.done, item.total)}%"></div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width: 0%"></div>
               </div>
-              <small class="ep-count">{item.done}/{item.total} Episodes Watched</small>
+              <small class="materi-count">{lesson.totalMateri} Materi Video</small>
             </div>
 
-            <div class="card-footer">
-              {#if item.status === "completed"}
-                <button class="btn-cert">Download Certificate</button>
-              {:else}
-                <a href="/courses/{item.id}" class="btn-play">Continue Learning</a>
-              {/if}
-            </div>
+            <a href="/courses/{lesson.id}" class="btn-action">
+              Lanjut Belajar ➔
+            </a>
+            
           </div>
         </div>
       {/each}
-    {/if}
-  </div>
+    </div>
+
+  {/if}
 </div>
 
 <style>
-  /* --- GLOBAL CONFIG --- */
-  :global(body) {
-    background-color: #f9fafb;
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+  :global(body) { 
+    background-color: #f8fafc; 
+    font-family: 'Plus Jakarta Sans', sans-serif; 
+    color: #0f172a;
   }
 
-  .page-container {
-    max-width: 1200px; /* Lebar ditambah agar grid muat 3-4 */
-    margin: 0 auto;
-    padding: 40px 20px;
-    font-family: "Inter", sans-serif;
-  }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 60px 20px; }
 
   /* --- HEADER --- */
-  .header-section {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 40px;
-    flex-wrap: wrap;
-    gap: 20px;
-  }
-  h1 {
-    font-size: 1.8rem;
-    margin: 0;
-    color: #111827;
-    letter-spacing: -0.5px;
-  }
-  .subtitle {
-    color: #6b7280;
-    margin: 4px 0 0 0;
-    font-size: 0.95rem;
+  .header { text-align: center; margin-bottom: 60px; }
+  
+  .pill-label { 
+    background: #fff7ed; 
+    color: #f97316; /* Orange Theme */
+    font-weight: 800; 
+    padding: 8px 18px; 
+    border-radius: 50px; 
+    font-size: 0.75rem; 
+    letter-spacing: 1px; 
+    display: inline-block; 
+    margin-bottom: 20px; 
+    border: 1px solid #ffedd5; 
   }
 
-  .search-wrap {
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    padding: 10px 15px;
-    gap: 10px;
-    width: 320px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  .header h1 { 
+    font-size: 2.8rem; 
+    margin: 0 0 15px 0; 
+    line-height: 1.2; 
+    color: #0f172a; 
+    letter-spacing: -1px; 
+    font-weight: 800; 
   }
-  .search-wrap:focus-within {
-    border-color: #f97316;
-    ring: 2px solid #fed7aa;
-  }
-  .search-wrap input {
-    border: none;
-    outline: none;
-    width: 100%;
-    font-size: 0.9rem;
-    color: #374151;
+  
+  .highlight { color: #f97316; }
+
+  .header p { 
+    font-size: 1.15rem; 
+    color: #64748b; 
+    max-width: 600px; 
+    margin: 0 auto; 
+    line-height: 1.6; 
   }
 
-  /* --- STATS WIDGET --- */
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-    margin-bottom: 40px;
+  /* --- EMPTY STATE (LOCKED) --- */
+  .empty-state { 
+    text-align: center; 
+    padding: 80px 20px; 
+    background: white; 
+    border-radius: 30px; 
+    border: 2px dashed #cbd5e1; 
+    max-width: 600px; 
+    margin: 0 auto; 
+    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.05); 
   }
-  .stat-card {
-    background: white;
-    padding: 20px;
-    border-radius: 16px;
-    border: 1px solid #e5e7eb;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+  
+  .icon-bg {
+    width: 100px; height: 100px; background: #fff7ed; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;
   }
-  .stat-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    display: grid;
-    place-items: center;
-    font-size: 1.2rem;
+  .lock-icon { font-size: 3rem; opacity: 0.8; }
+  
+  .empty-state h3 { margin: 0 0 10px 0; color: #0f172a; font-size: 1.8rem; }
+  .empty-state p { color: #64748b; margin: 0 0 30px 0; line-height: 1.6; }
+  
+  .btn-group { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+  
+  .btn-primary { 
+    background: #0f172a; 
+    color: white; 
+    padding: 14px 35px; 
+    border-radius: 50px; 
+    font-weight: 700; 
+    text-decoration: none; 
+    transition: 0.3s; 
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
   }
-  .stat-icon.orange {
-    background: #fff7ed;
-    color: #f97316;
+  .btn-primary:hover { background: #f97316; transform: translateY(-3px); box-shadow: 0 15px 30px rgba(249, 115, 22, 0.3); }
+  
+  .btn-outline { 
+    background: white; 
+    color: #0f172a; 
+    border: 2px solid #e2e8f0; 
+    padding: 14px 35px; 
+    border-radius: 50px; 
+    font-weight: 700; 
+    text-decoration: none; 
+    transition: 0.3s; 
   }
-  .stat-icon.green {
-    background: #ecfdf5;
-    color: #10b981;
-  }
-  .stat-icon.blue {
-    background: #eff6ff;
-    color: #3b82f6;
+  .btn-outline:hover { border-color: #0f172a; }
+
+  /* --- CARD GRID --- */
+  .grid-container { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
+    gap: 30px; 
   }
 
-  .stat-val {
-    display: block;
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: #1f2937;
-    line-height: 1;
-    margin-bottom: 2px;
+  .course-card { 
+    background: white; 
+    border-radius: 24px; 
+    overflow: hidden; 
+    border: 1px solid #f1f5f9; 
+    transition: all 0.3s ease; 
+    display: flex; 
+    flex-direction: column; 
+    height: 100%; 
+    position: relative; 
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); 
   }
-  .stat-label {
-    font-size: 0.85rem;
-    color: #6b7280;
-    font-weight: 500;
-  }
-
-  /* --- TABS --- */
-  .tabs-container {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 25px;
-    background: #e5e7eb;
-    padding: 4px;
-    border-radius: 12px;
-    width: fit-content;
-  }
-  .tabs-container button {
-    background: transparent;
-    border: none;
-    padding: 8px 20px;
-    font-weight: 600;
-    color: #6b7280;
-    cursor: pointer;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    transition: 0.2s;
-  }
-  .tabs-container button.active {
-    background: white;
-    color: #111827;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  .course-card:hover { 
+    transform: translateY(-8px); 
+    box-shadow: 0 20px 40px -5px rgba(0,0,0,0.1); 
+    border-color: #fed7aa; 
   }
 
-  /* --- GRID SYSTEM (KUNCI KERAPIHAN) --- */
-  .lesson-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Responsif otomatis */
-    gap: 24px;
+  /* IMAGE */
+  .card-image { 
+    height: 200px; 
+    background-size: cover; 
+    background-position: center; 
+    position: relative; 
+  }
+  .card-image::after { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.2); transition: 0.3s; }
+  .course-card:hover .card-image::after { background: rgba(0,0,0,0.1); }
+  
+  .category-badge { 
+    position: absolute; 
+    top: 15px; left: 15px; 
+    z-index: 2; 
+    background: rgba(255,255,255,0.95); 
+    color: #c2410c; 
+    font-size: 0.7rem; 
+    font-weight: 800; 
+    padding: 6px 12px; 
+    border-radius: 8px; 
+    text-transform: uppercase; 
+    letter-spacing: 0.5px; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+  }
+  
+  .play-overlay { position: absolute; inset: 0; display: grid; place-items: center; z-index: 2; opacity: 0; transition: 0.3s; }
+  .course-card:hover .play-overlay { opacity: 1; }
+  .play-btn { 
+    width: 60px; height: 60px; 
+    background: rgba(255,255,255,0.9); 
+    border-radius: 50%; 
+    display: grid; place-items: center; 
+    color: #f97316; font-size: 1.5rem; padding-left: 4px; 
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2); 
+    transform: scale(0.8); transition: 0.3s; 
+  }
+  .course-card:hover .play-btn { transform: scale(1); }
+
+  /* BODY */
+  .card-body { padding: 24px; flex: 1; display: flex; flex-direction: column; }
+  
+  .course-title { 
+    margin: 0 0 8px 0; 
+    font-size: 1.2rem; 
+    line-height: 1.4; 
+    color: #0f172a; 
+    font-weight: 700; 
+  }
+  .mentor-name { color: #64748b; font-size: 0.9rem; font-weight: 500; margin: 0 0 25px 0; }
+
+  /* PROGRESS BAR */
+  .progress-section { margin-top: auto; margin-bottom: 24px; }
+  .progress-info { display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700; color: #475569; margin-bottom: 8px; }
+  .progress-track { height: 8px; background: #f1f5f9; border-radius: 10px; overflow: hidden; margin-bottom: 8px; }
+  .progress-fill { height: 100%; background: #f97316; border-radius: 10px; }
+  .materi-count { font-size: 0.75rem; color: #94a3b8; font-weight: 600; }
+
+  /* ACTION BUTTON */
+  .btn-action { 
+    width: 100%; 
+    border: none; 
+    padding: 14px; 
+    border-radius: 12px; 
+    font-weight: 700; 
+    cursor: pointer; 
+    transition: all 0.3s ease; 
+    font-size: 0.95rem; 
+    text-align: center; 
+    text-decoration: none; 
+    display: block; 
+    box-sizing: border-box; 
+    background: #0f172a; 
+    color: white; 
+  }
+  .btn-action:hover { 
+    background: #f97316; 
+    transform: translateY(-2px); 
+    box-shadow: 0 10px 20px rgba(249, 115, 22, 0.3); 
   }
 
-  /* --- CARD DESIGN --- */
-  .lesson-card {
-    background: white;
-    border-radius: 16px;
-    border: 1px solid #f3f4f6;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column; /* Vertikal Layout */
-    transition:
-      transform 0.2s,
-      box-shadow 0.2s;
-    height: 100%; /* Agar semua card sama tinggi */
-  }
-  .lesson-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.08);
-    border-color: #fed7aa;
-  }
-
-  .card-thumb {
-    height: 160px;
-    width: 100%;
-    background-size: cover;
-    background-position: center;
-    position: relative;
-  }
-  .badge-done {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    background: rgba(16, 185, 129, 0.9);
-    backdrop-filter: blur(4px);
-    color: white;
-    font-weight: 700;
-    font-size: 0.7rem;
-    padding: 4px 10px;
-    border-radius: 20px;
-  }
-
-  .card-body {
-    padding: 20px;
-    flex: 1; /* Mengisi sisa ruang */
-    display: flex;
-    flex-direction: column;
-  }
-
-  .mentor-text {
-    color: #9ca3af;
-    font-size: 0.8rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  .card-title {
-    margin: 5px 0 20px 0;
-    font-size: 1.1rem;
-    color: #1f2937;
-    line-height: 1.4;
-  }
-
-  .progress-section {
-    margin-bottom: 20px;
-    margin-top: auto; /* Dorong ke bawah jika konten sedikit */
-  }
-  .p-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: #4b5563;
-  }
-  .p-track {
-    height: 6px;
-    background: #f3f4f6;
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 6px;
-  }
-  .p-fill {
-    height: 100%;
-    background: #f97316;
-    border-radius: 10px;
-  }
-  .p-fill.green {
-    background: #10b981;
-  }
-  .ep-count {
-    font-size: 0.75rem;
-    color: #9ca3af;
-  }
-
-  .card-footer {
-    margin-top: auto;
-  }
-  .btn-play {
-    display: block;
-    text-align: center;
-    text-decoration: none;
-    background: #1f2937;
-    color: white;
-    padding: 10px;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 0.9rem;
-    transition: 0.2s;
-  }
-  .btn-play:hover {
-    background: #f97316;
-  }
-
-  .btn-cert {
-    width: 100%;
-    background: white;
-    border: 1px solid #d1d5db;
-    color: #374151;
-    padding: 10px;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 0.9rem;
-    cursor: pointer;
-  }
-  .btn-cert:hover {
-    border-color: #10b981;
-    color: #10b981;
-    background: #f0fdf4;
-  }
-
-  /* --- EMPTY STATE --- */
-  .empty-state {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 80px 20px;
-    color: #9ca3af;
-  }
-  .empty-icon {
-    font-size: 3rem;
-    margin-bottom: 10px;
-    opacity: 0.5;
-  }
-
-  /* --- RESPONSIVE --- */
   @media (max-width: 640px) {
-    .header-section {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-    .search-wrap {
-      width: 100%;
-      box-sizing: border-box;
-    }
-    .lesson-grid {
-      grid-template-columns: 1fr;
-    } /* 1 Kolom di HP */
+    .header h1 { font-size: 2rem; }
+    .grid-container { grid-template-columns: 1fr; }
   }
 </style>

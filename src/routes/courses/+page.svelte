@@ -1,426 +1,290 @@
 <script>
-  // Kategori Filter
-  const categories = ["All", "UI/UX Design", "Front End", "Back End", "Branding", "Marketing"];
-  let activeCat = "All";
+  import { user, isPremium, ownedCourses } from "$lib/stores";
+  import { fly, fade, scale, slide } from "svelte/transition";
+  import { elasticOut, cubicInOut } from "svelte/easing";
+  import { onMount } from "svelte";
+  import { goto } from "$app/navigation";
+  import { page } from "$app/stores"; 
+  import toast, { Toaster } from 'svelte-french-toast'; // Import Toast
 
-  // Data Materi (Dummy)
-  const activeCourse = {
-    title: "Mastering Mobile App Design",
-    mentor: "Padhang Satrio",
-    progress: 75,
-    total: 24,
-    done: 18,
-    img: "https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&q=80",
-  };
+  // STATE WELCOME
+  let showWelcome = false;
+  let showContent = false; 
 
-  const courses = [
-    { id: 1, title: "HTML & CSS for Beginners", mentor: "leonardo plephon", level: "Beginner", videos: 12, img: "https://images.unsplash.com/photo-1587620962725-abab7fe55159?w=400&q=80", tag: "Front End" },
-    { id: 2, title: "Advanced Brand Identity", mentor: "Bayu Salto", level: "Advanced", videos: 20, img: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=400&q=80", tag: "Branding" },
-    { id: 3, title: "Javascript Modern ES6", mentor: "Jhon Tosan", level: "Intermediate", videos: 15, img: "https://images.unsplash.com/photo-1579468118864-1b9ea3c0db4a?w=400&q=80", tag: "Front End" },
-    { id: 4, title: "User Research Mastery", mentor: "kucai", level: "Advanced", videos: 8, img: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&q=80", tag: "UI/UX Design" },
-    { id: 5, title: "Digital Marketing 101", mentor: "Sarah Vi", level: "Beginner", videos: 10, img: "https://images.unsplash.com/photo-1533750516457-a7f992034fec?w=400&q=80", tag: "Marketing" },
-    { id: 6, title: "React JS Fundamental", mentor: "Bagas Mahpie", level: "Intermediate", videos: 25, img: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400&q=80", tag: "Front End" },
+  // STATE PAYMENT
+  let showPaymentModal = false;
+  let selectedPayment = 'bca';
+  let isLoading = false;
+  let selectedCourseToBuy = null; // Menyimpan data kursus yang sedang dibeli
+
+  const formatRp = (num) => new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(num);
+
+  onMount(() => {
+    const isJustSubscribed = $page.url.searchParams.get('new') === 'true';
+    if ($isPremium && isJustSubscribed) {
+        showWelcome = true;
+        setTimeout(() => showContent = true, 500); 
+    }
+  });
+
+  function startExplore() {
+    showWelcome = false;
+    goto('/courses', { replaceState: true });
+  }
+
+  // --- DATA KURSUS ---
+  const catalogData = [
+    { id: 1, title: "Mastering Mobile App Design", category: "Design", price: 150000, img: "https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&q=80" },
+    { id: 2, title: "Fullstack Web Developer", category: "Development", price: 250000, img: "https://images.unsplash.com/photo-1587620962725-abab7fe55159?w=400&q=80" },
+    { id: 3, title: "Advanced Brand Identity", category: "Design", price: 175000, img: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=400&q=80" },
+    { id: 4, title: "Python for Data Science", category: "Data", price: 200000, img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80" },
+    { id: 5, title: "Digital Marketing Mastery", category: "Marketing", price: 125000, img: "https://images.unsplash.com/photo-1533750516457-a7f992034fec?w=400&q=80" },
+    { id: 6, title: "3D Modeling with Blender", category: "Design", price: 180000, img: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=400&q=80" },
   ];
 
-  // Logic Filter
-  $: filteredCourses = activeCat === "All" ? courses : courses.filter((c) => c.tag === activeCat);
+  // 1. FUNGSI KLIK BELI (BUKA MODAL)
+  function openPayment(course) {
+    if ($ownedCourses.includes(course.id)) {
+        toast.success("✅ Kamu sudah punya kursus ini!");
+        return;
+    }
+    selectedCourseToBuy = course; // Simpan data kursus
+    showPaymentModal = true;      // Buka Modal
+  }
+
+  // 2. FUNGSI PROSES BAYAR
+  function processPayment() {
+    isLoading = true;
+    const loadingId = toast.loading("Memproses pembayaran...");
+
+    setTimeout(() => {
+        // Simpan kursus ke store
+        $ownedCourses = [...$ownedCourses, selectedCourseToBuy.id];
+        
+        // Aktifkan status student jika belum
+        if (!$isPremium) {
+            $isPremium = true; 
+            $user.role = "Active Student";
+        }
+
+        isLoading = false;
+        showPaymentModal = false;
+        toast.dismiss(loadingId);
+
+        toast.success(`Berhasil membeli ${selectedCourseToBuy.title}!`, {
+            duration: 4000,
+            icon: '🎉'
+        });
+
+    }, 2000);
+  }
 </script>
 
-<div class="lesson-container">
-  <div class="top-header">
-    <div class="search-bar">
-      <span>🔍</span>
-      <input type="text" placeholder="Find your favorite course..." />
-    </div>
-    <div class="right-tools">
-      <button class="icon-btn">🔔</button>
-      <div class="profile-pill">
-        <img src="https://ui-avatars.com/api/?name=Jason+Ranti" alt="p" />
-        <span>Jason Ranti</span>
-      </div>
-    </div>
-  </div>
+<Toaster />
 
-  <div class="active-banner">
-    <div class="ab-content">
-      <span class="status-badge">🔥 Sedang Dipelajari</span>
-      <h1>{activeCourse.title}</h1>
-      <div class="ab-meta">
-        <img src="https://ui-avatars.com/api/?name={activeCourse.mentor}" alt="m" />
-        <span>{activeCourse.mentor} • {activeCourse.done}/{activeCourse.total} Video</span>
+<div class="page-container">
+
+  {#if showPaymentModal}
+  <div class="modal-overlay" transition:fade={{ duration: 200 }}>
+    <div class="payment-box" transition:scale={{ duration: 200, start: 0.95 }}>
+      
+      <div class="pay-header">
+        <h3>Checkout Kelas 🎓</h3>
+        <button class="close-x" on:click={() => showPaymentModal = false}>✕</button>
       </div>
 
-      <div class="progress-area">
-        <div class="p-track">
-          <div class="p-fill" style="width: {activeCourse.progress}%"></div>
+      <div class="pay-summary">
+        <div class="row">
+            <span>Item</span>
+            <strong>{selectedCourseToBuy.title}</strong>
         </div>
-        <span>{activeCourse.progress}%</span>
+        <div class="row">
+            <span>Kategori</span>
+            <span>{selectedCourseToBuy.category}</span>
+        </div>
+        <div class="row total">
+            <span>Total Tagihan</span>
+            <span class="price-tag">{formatRp(selectedCourseToBuy.price)}</span>
+        </div>
       </div>
 
-      <button class="btn-continue">Lanjutkan Belajar ➔</button>
-    </div>
-    <div class="ab-image" style="background-image: url('{activeCourse.img}')"></div>
-  </div>
+      <div class="pay-method-section">
+        <label>Pilih Metode Pembayaran</label>
+        <div class="method-grid">
+            <button class="method-card {selectedPayment === 'bca' ? 'selected' : ''}" on:click={() => selectedPayment = 'bca'}>
+                <div class="logo-placeholder bca">BCA</div>
+                {#if selectedPayment === 'bca'} <div class="check">✓</div> {/if}
+            </button>
 
-  <div class="filter-tabs">
-    {#each categories as cat}
-      <button class:active={activeCat === cat} on:click={() => (activeCat = cat)}>
-        {cat}
+            <button class="method-card {selectedPayment === 'mandiri' ? 'selected' : ''}" on:click={() => selectedPayment = 'mandiri'}>
+                <div class="logo-placeholder mandiri">MANDIRI</div>
+                {#if selectedPayment === 'mandiri'} <div class="check">✓</div> {/if}
+            </button>
+
+            <button class="method-card {selectedPayment === 'gopay' ? 'selected' : ''}" on:click={() => selectedPayment = 'gopay'}>
+                <div class="logo-placeholder gopay">GOPAY</div>
+                {#if selectedPayment === 'gopay'} <div class="check">✓</div> {/if}
+            </button>
+            
+            <button class="method-card {selectedPayment === 'qris' ? 'selected' : ''}" on:click={() => selectedPayment = 'qris'}>
+                <div class="logo-placeholder">QRIS</div>
+                {#if selectedPayment === 'qris'} <div class="check">✓</div> {/if}
+            </button>
+        </div>
+      </div>
+
+      <button class="btn-pay-now" on:click={processPayment} disabled={isLoading}>
+        {#if isLoading}⏳ Memproses... {:else} Bayar Sekarang 🔒 {/if}
       </button>
-    {/each}
+      
+    </div>
   </div>
+  {/if}
 
-  <div class="course-grid">
-    {#each filteredCourses as c}
-      <a href="/courses/{c.id}" class="course-card">
-        <div class="course-card">
-          <div class="card-cover" style="background-image: url('{c.img}')">
-            <div class="level-tag">{c.level}</div>
-          </div>
 
-          <div class="card-body">
-            <small class="cat-text">{c.tag}</small>
-            <h3>{c.title}</h3>
-
-            <div class="card-footer">
-              <div class="mentor-info">
-                <img src="https://ui-avatars.com/api/?name={c.mentor}" alt="m" />
-                <span>{c.mentor}</span>
-              </div>
-              <div class="video-count">
-                🎥 {c.videos} Eps
-              </div>
-            </div>
-
-            <button class="btn-start">Tonton</button>
-          </div>
+  {#if showWelcome}
+    <div class="celebration-overlay" out:fly={{ y: -1000, duration: 1000, easing: cubicInOut }}>
+        <div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
+        <div class="content-box">
+            {#if showContent}
+                <div class="icon-wrapper" in:scale={{ duration: 800, easing: elasticOut, start: 0 }}>
+                    <img src="/logo.jpg" alt="Logo" class="welcome-logo" />
+                </div>
+                <h1 in:fly={{ y: 50, duration: 800, delay: 200 }}>
+                    Selamat Datang, <br> <span class="gradient-text">Khwarizmi Academy</span>
+                </h1>
+                <p in:fly={{ y: 50, duration: 800, delay: 400 }}>
+                    Semua gembok telah terbuka. Akses <strong>seluruh Kelas Premium</strong> tanpa batas.
+                </p>
+                <button class="btn-blast" on:click={startExplore} in:fly={{ y: 50, duration: 800, delay: 600 }}>
+                    Mulai Jelajahi Kelas
+                </button>
+            {/if}
         </div>
-      </a>
-    {/each}
+    </div>
+  {/if}
+
+
+  <div class="catalog-content">
+    <div class="header">
+        <div class="pill">KATALOG PREMIUM</div>
+        <h1>Tentukan Jalan Karirmu</h1>
+        <p>Pilih skill yang ingin kamu kuasai hari ini.</p>
+    </div>
+
+    <div class="grid-container">
+        {#each catalogData as item}
+            {@const isOwned = $ownedCourses.includes(item.id)}
+
+            <div class="course-card">
+                <div class="card-image" style="background-image: url('{item.img}')">
+                    {#if isOwned}
+                        <div class="overlay-owned"><span>✓ SIAP BELAJAR</span></div>
+                    {:else if $isPremium}
+                        <div class="overlay-pro"><span>🔓 UNLOCKED</span></div>
+                    {/if}
+                    <div class="cat-badge">{item.category}</div>
+                </div>
+
+                <div class="card-body">
+                    <h3>{item.title}</h3>
+                    
+                    <div class="action-area">
+                        {#if isOwned}
+                            <a href="/lesson" class="btn-main owned">Lanjut Belajar ➔</a>
+                        {:else}
+                            {#if $isPremium}
+                                <button class="btn-main pro" on:click={() => openPayment(item)}>
+                                    Ambil Kelas (Gratis)
+                                </button>
+                            {:else}
+                                <button class="btn-main buy" on:click={() => openPayment(item)}>
+                                    Beli {formatRp(item.price)}
+                                </button>
+                            {/if}
+                        {/if}
+                    </div>
+                </div>
+            </div>
+        {/each}
+    </div>
   </div>
+
 </div>
 
 <style>
-  a.course-card {
-    text-decoration: none;
-    color: inherit;
-    display: block;
-  }
-  /* GLOBAL LAYOUT */
-  .lesson-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding-bottom: 50px;
-  }
+  :global(body) { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background: #FFF7ED; overflow-x: hidden; }
 
-  /* --- 1. HEADER --- */
-  .top-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-  }
-  .search-bar {
-    background: white;
-    padding: 12px 20px;
-    border-radius: 50px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    width: 400px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.02);
-  }
-  .search-bar input {
-    border: none;
-    outline: none;
-    width: 100%;
-    font-size: 0.95rem;
-  }
+  /* --- STYLE MODAL PEMBAYARAN --- */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 9999; display: grid; place-items: center; padding: 20px; }
+  .payment-box { background: white; width: 100%; max-width: 450px; border-radius: 24px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); position: relative; }
+  
+  .pay-header { padding: 20px 25px; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center; background: #fff7ed; }
+  .pay-header h3 { margin: 0; font-size: 1.1rem; color: #9a3412; }
+  .close-x { background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: #9a3412; font-weight: bold; }
+  
+  .pay-summary { padding: 25px; background: #f9fafb; border-bottom: 1px solid #f3f4f6; }
+  .row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; color: #4b5563; }
+  .row.total { margin-top: 15px; border-top: 1px dashed #d1d5db; padding-top: 15px; align-items: center; }
+  .row.total span { font-weight: 700; font-size: 1.1rem; color: #1f2937; }
+  .price-tag { color: #ea580c !important; font-size: 1.3rem !important; }
 
-  .right-tools {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-  }
-  .icon-btn {
-    background: white;
-    border: none;
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    font-size: 1.2rem;
-    cursor: pointer;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
-  }
-  .profile-pill {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: white;
-    padding: 6px 15px 6px 6px;
-    border-radius: 50px;
-    font-weight: 600;
-    font-size: 0.9rem;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
-  }
-  .profile-pill img {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-  }
+  .pay-method-section { padding: 25px; }
+  .pay-method-section label { display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 15px; color: #374151; }
+  
+  .method-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+  .method-card { border: 2px solid #e5e7eb; background: white; border-radius: 12px; padding: 15px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative; transition: 0.2s; }
+  .method-card:hover { border-color: #fdba74; background: #fff7ed; }
+  .method-card.selected { border-color: #f97316; background: #fff7ed; box-shadow: 0 4px 6px -1px rgba(249, 115, 22, 0.1); }
+  
+  .logo-placeholder { font-weight: 900; font-size: 0.8rem; letter-spacing: 1px; }
+  .bca { color: #00529C; } .mandiri { color: #FFB700; } .gopay { color: #00AED6; }
+  .check { position: absolute; top: 5px; right: 5px; width: 18px; height: 18px; background: #f97316; color: white; border-radius: 50%; font-size: 0.7rem; display: grid; place-items: center; font-weight: bold; }
 
-  /* --- 2. ACTIVE BANNER --- */
-  .active-banner {
-    background: white;
-    border-radius: 30px;
-    padding: 30px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 30px;
-    margin-bottom: 40px;
-    overflow: hidden;
-    position: relative;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
-    border: 1px solid #fff7ed;
-  }
-  .ab-content {
-    flex: 1;
-    z-index: 2;
-  }
-  .status-badge {
-    background: #fff7ed;
-    color: #f97316;
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-  }
-  .active-banner h1 {
-    font-size: 2rem;
-    margin: 15px 0;
-    color: #1f2937;
-    line-height: 1.2;
-  }
+  .btn-pay-now { width: calc(100% - 50px); margin: 0 25px 15px 25px; padding: 14px; background: #111827; color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 1rem; transition: 0.2s; }
+  .btn-pay-now:hover { background: #ea580c; transform: translateY(-2px); }
+  .btn-pay-now:disabled { background: #9ca3af; cursor: not-allowed; }
 
-  .ab-meta {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
-    color: #6b7280;
-    font-weight: 500;
-  }
-  .ab-meta img {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-  }
+  /* --- EXISTING STYLES (Sama spt sebelumnya) --- */
+  .catalog-content { max-width: 1200px; margin: 0 auto; padding: 60px 20px; min-height: 100vh; }
+  .header { text-align: center; margin-bottom: 50px; }
+  .pill { background: #e0e7ff; color: #4338ca; font-size: 0.7rem; font-weight: 800; padding: 5px 15px; border-radius: 50px; display: inline-block; margin-bottom: 15px; letter-spacing: 1px; }
+  .header h1 { font-size: 2.5rem; margin: 0 0 10px 0; color: #111827; }
+  .header p { color: #6b7280; font-size: 1.1rem; }
+  .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
+  .course-card { background: white; border-radius: 20px; overflow: hidden; border: 1px solid #f1f5f9; display: flex; flex-direction: column; transition: 0.2s; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); }
+  .course-card:hover { transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); border-color: #fdba74; }
+  .card-image { height: 200px; background-size: cover; background-position: center; position: relative; }
+  .cat-badge { position: absolute; top: 15px; left: 15px; background: white; color: #111827; font-size: 0.7rem; font-weight: 800; padding: 4px 10px; border-radius: 6px; }
+  .overlay-owned { position: absolute; inset: 0; background: rgba(22, 163, 74, 0.9); display: grid; place-items: center; }
+  .overlay-owned span { color: white; font-weight: 800; border: 2px solid white; padding: 5px 15px; border-radius: 50px; }
+  .overlay-pro { position: absolute; inset: 0; background: rgba(249, 115, 22, 0.85); display: grid; place-items: center; opacity: 0; transition: 0.3s; }
+  .course-card:hover .overlay-pro { opacity: 1; }
+  .overlay-pro span { color: white; font-weight: 800; font-size: 1.2rem; border: 2px solid white; padding: 5px 15px; border-radius: 50px; }
+  .card-body { padding: 20px; display: flex; flex-direction: column; flex: 1; }
+  h3 { margin: 0 0 20px 0; font-size: 1.1rem; color: #1f2937; line-height: 1.4; flex: 1; }
+  .action-area { margin-top: auto; }
+  .btn-main { width: 100%; padding: 14px; border-radius: 12px; font-weight: 700; border: none; cursor: pointer; text-align: center; display: block; text-decoration: none; font-size: 0.95rem; transition: 0.2s; }
+  .buy { background: #111827; color: white; }
+  .buy:hover { background: #f97316; transform: translateY(-2px); }
+  .pro { background: #F97316; color: white; }
+  .pro:hover { background: #ea580c; transform: translateY(-2px); }
+  .owned { background: #dcfce7; color: #166534; }
+  .owned:hover { background: #bbf7d0; }
 
-  .progress-area {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 25px;
-  }
-  .p-track {
-    flex: 1;
-    height: 10px;
-    background: #f3f4f6;
-    border-radius: 10px;
-    overflow: hidden;
-  }
-  .p-fill {
-    height: 100%;
-    background: #f97316;
-    border-radius: 10px;
-  }
-  .progress-area span {
-    font-weight: 700;
-    color: #f97316;
-  }
-
-  .btn-continue {
-    background: #1f2937;
-    color: white;
-    border: none;
-    padding: 12px 25px;
-    border-radius: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.2s;
-  }
-  .btn-continue:hover {
-    background: #f97316;
-    transform: translateY(-2px);
-  }
-
-  .ab-image {
-    width: 350px;
-    height: 250px;
-    background-size: cover;
-    background-position: center;
-    border-radius: 20px;
-    position: relative;
-  }
-  /* Efek gradient di atas gambar */
-  .ab-image::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to right, white 0%, transparent 50%);
-    border-radius: 20px;
-  }
-
-  /* --- 3. FILTERS --- */
-  .filter-tabs {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 30px;
-    overflow-x: auto;
-    padding-bottom: 5px;
-  }
-  .filter-tabs button {
-    background: white;
-    border: 1px solid #e5e7eb;
-    padding: 10px 20px;
-    border-radius: 50px;
-    font-weight: 600;
-    color: #6b7280;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: 0.2s;
-  }
-  .filter-tabs button:hover {
-    border-color: #f97316;
-    color: #f97316;
-  }
-  .filter-tabs button.active {
-    background: #f97316;
-    color: white;
-    border-color: #f97316;
-  }
-
-  /* --- 4. GRID --- */
-  .course-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 30px;
-  }
-
-  .course-card {
-    background: white;
-    border-radius: 24px;
-    padding: 15px;
-    border: 1px solid #f3f4f6;
-    transition: 0.3s;
-  }
-  .course-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.05);
-  }
-
-  .card-cover {
-    height: 180px;
-    background-size: cover;
-    background-position: center;
-    border-radius: 18px;
-    position: relative;
-    margin-bottom: 15px;
-  }
-  .level-tag {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(5px);
-    color: white;
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 0.7rem;
-    font-weight: 600;
-  }
-
-  .card-body {
-    padding: 5px 10px;
-  }
-  .cat-text {
-    color: #f97316;
-    font-weight: 700;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-  }
-  h3 {
-    margin: 5px 0 15px 0;
-    font-size: 1.1rem;
-    color: #111827;
-  }
-
-  .card-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-  .mentor-info {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    font-size: 0.85rem;
-    color: #6b7280;
-  }
-  .mentor-info img {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-  }
-  .video-count {
-    font-size: 0.8rem;
-    color: #9ca3af;
-    background: #f9fafb;
-    padding: 4px 8px;
-    border-radius: 6px;
-  }
-
-  .btn-start {
-    width: 100%;
-    background: white;
-    border: 1px solid #e5e7eb;
-    color: #1f2937;
-    padding: 10px;
-    border-radius: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.2s;
-  }
-  .btn-start:hover {
-    background: #f97316;
-    border-color: #f97316;
-    color: white;
-  }
-
-  /* RESPONSIVE */
-  @media (max-width: 900px) {
-    .top-header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 15px;
-    }
-    .search-bar {
-      width: 100%;
-    }
-    .active-banner {
-      flex-direction: column;
-      padding: 20px;
-    }
-    .ab-image {
-      width: 100%;
-      height: 200px;
-      order: -1;
-    }
-    .ab-image::after {
-      background: linear-gradient(to top, white 0%, transparent 50%);
-    }
-  }
-</style>
+  /* OVERLAY WELCOME */
+  .celebration-overlay { position: fixed; inset: 0; background: #0F172A; z-index: 9999; display: flex; align-items: center; justify-content: center; text-align: center; color: white; overflow: hidden; }
+  .content-box { position: relative; z-index: 10; padding: 20px; max-width: 600px; }
+  .icon-wrapper { margin-bottom: 25px; animation: float 3s ease-in-out infinite; display: inline-block; }
+  .welcome-logo { width: 50px; height: auto; object-fit: cover; }
+  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+  .gradient-text { background: linear-gradient(to right, #F97316, #FDBA74); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .btn-blast { background: white; color: #0F172A; border: none; padding: 16px 40px; font-size: 1.1rem; font-weight: 700; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 0 30px rgba(255,255,255,0.3); }
+  .btn-blast:hover { transform: scale(1.05) translateY(-2px); box-shadow: 0 0 50px rgba(255,255,255,0.6); }
+  .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; }
+  .orb-1 { width: 400px; height: 400px; background: #F97316; top: -100px; left: -100px; animation: drift 10s infinite alternate; }
+  .orb-2 { width: 300px; height: 300px; background: #4F46E5; bottom: -50px; right: -50px; animation: drift 12s infinite alternate-reverse; }
+  .orb-3 { width: 200px; height: 200px; background: #EC4899; top: 40%; left: 40%; opacity: 0.4; animation: pulse 8s infinite; }
+  @keyframes drift { from { transform: translate(0,0); } to { transform: translate(30px, 30px); } }
+  @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+</style>    

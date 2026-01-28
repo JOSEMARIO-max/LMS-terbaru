@@ -1,71 +1,106 @@
 import { writable } from 'svelte/store';
-import { browser } from '$app/environment'; // Ini biar tau kita lagi di browser atau server
+import { browser } from '$app/environment';
+
+// --- HELPER: Biar gak error pas baca JSON ---
+function safeParse(jsonString, fallback) {
+  try {
+    return jsonString ? JSON.parse(jsonString) : fallback;
+  } catch (e) {
+    return fallback;
+  }
+}
 
 // ==========================================
-// 1. STORE USER (PROFIL) - DENGAN AUTO SAVE
+// 1. STORE USER (DATA PROFIL)
 // ==========================================
-
-// Data Bawaan (Dipakai kalau baru pertama kali buka / belum pernah edit)
 const defaultUser = {
-  name: "Jason Ranti",
-  role: "Student Class 1",
-  email: "jason@sekolah.id",
-  phone: "0812-9999-8888",
-  bio: "Suka belajar coding dan desain sambil ngopi ☕",
-  location: "Bandung, Indonesia",
-  avatar: "https://ui-avatars.com/api/?name=Jason+Ranti&background=0D8ABC&color=fff&size=128"
+    name: "Rioolin",
+    role: "Regular Member",
+    avatar: "https://ui-avatars.com/api/?name=Rioolin&background=0D8ABC&color=fff",
+    location: "Jakarta, Indonesia",
+    email: "rioolin@example.com",
+    phone: "081234567890"
 };
 
-// Cek LocalStorage dulu:
-// "Eh browser, ada data 'my_user_data' gak? Kalo ada pake itu, kalo gak pake defaultUser"
-const initialUser = browser && localStorage.getItem('my_user_data') 
-  ? JSON.parse(localStorage.getItem('my_user_data')) 
+const initialUser = browser 
+  ? safeParse(localStorage.getItem('khwarizmi_user'), defaultUser) 
   : defaultUser;
 
 export const user = writable(initialUser);
 
-// Subscribe: Setiap kali data 'user' berubah, simpan ke LocalStorage
 if (browser) {
-  user.subscribe((val) => {
-    localStorage.setItem('my_user_data', JSON.stringify(val));
-  });
+  user.subscribe((val) => localStorage.setItem('khwarizmi_user', JSON.stringify(val)));
 }
 
 // ==========================================
-// 2. STORE TASKS (TUGAS) - DENGAN AUTO SAVE
+// 2. STORE KURSUS (YANG DIMILIKI)
 // ==========================================
+const initialOwned = browser 
+  ? safeParse(localStorage.getItem('khwarizmi_courses'), []) 
+  : []; 
 
+export const ownedCourses = writable(initialOwned);
+
+if (browser) {
+  ownedCourses.subscribe((val) => localStorage.setItem('khwarizmi_courses', JSON.stringify(val)));
+}
+
+// ==========================================
+// 3. PREMIUM STATUS (LANGGANAN)
+// ==========================================
+const initialPremium = browser
+  ? safeParse(localStorage.getItem('khwarizmi_premium'), false)
+  : false;
+
+export const isPremium = writable(initialPremium);
+
+if (browser) {
+  isPremium.subscribe((val) => localStorage.setItem('khwarizmi_premium', JSON.stringify(val)));
+}
+
+// ==========================================
+// 4. STORE TUGAS (ASSIGNMENTS)
+// ==========================================
+// Data dummy awal kalau belum ada di localStorage
 const defaultTasks = [
-  { 
-    id: 1, 
-    title: "Redesign Homepage UI", 
-    desc: "Bikin landing page yang modern dark mode.", 
-    mapel: "UI/UX Design", 
-    due: "Besok, 23:59", 
-    priority: "High", 
-    status: "To Do",
-    team: ["Jason", "Sarah"] 
-  },
-  { 
-    id: 2, 
-    title: "Belajar SvelteKit Store", 
-    desc: "Pahami cara kerja writable store.", 
-    mapel: "Front End", 
-    due: "Lusa", 
-    priority: "Medium", 
-    status: "In Progress",
-    team: ["Jason"] 
-  }
+    {
+        id: 1,
+        title: "Redesign Homepage App",
+        mapel: "UI/UX Design",
+        desc: "Buat konsep baru yang lebih modern untuk halaman utama aplikasi.",
+        priority: "High",
+        status: "To Do",
+        team: ["Rio"],
+        due: "Besok"
+    },
+    {
+        id: 2,
+        title: "Slicing Landing Page",
+        mapel: "Frontend Dev",
+        desc: "Convert desain Figma ke HTML/CSS menggunakan Tailwind.",
+        priority: "Medium",
+        status: "In Progress",
+        team: ["Rio"],
+        due: "3 Hari Lagi"
+    },
+    {
+        id: 3,
+        title: "Analisis Data User",
+        mapel: "Data Science",
+        desc: "Cek data user aktif bulan lalu.",
+        priority: "Low",
+        status: "Completed",
+        team: ["Rio"],
+        due: "Selesai"
+    }
 ];
 
-const initialTasks = browser && localStorage.getItem('my_tasks_data')
-  ? JSON.parse(localStorage.getItem('my_tasks_data'))
+const initialTasks = browser
+  ? safeParse(localStorage.getItem('khwarizmi_tasks'), defaultTasks)
   : defaultTasks;
 
 export const tasks = writable(initialTasks);
 
 if (browser) {
-  tasks.subscribe((val) => {
-    localStorage.setItem('my_tasks_data', JSON.stringify(val));
-  });
+  tasks.subscribe((val) => localStorage.setItem('khwarizmi_tasks', JSON.stringify(val)));
 }
