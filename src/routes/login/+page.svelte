@@ -1,402 +1,109 @@
-<script>
+<script lang="ts">
   import { goto } from "$app/navigation";
+  import { fade, fly } from "svelte/transition";
 
-  let email = "";
-  let password = "";
-  let isLoading = false;
+  // --- SVELTE 5 RUNES ---
+  let email = $state("");
+  let password = $state("");
+  let isLoading = $state(false);
 
-  function handleLogin() {
+  function handleLogin(e: SubmitEvent) {
+    e.preventDefault();
     isLoading = true;
     setTimeout(() => {
       isLoading = false;
-      goto("/dashboard");
+      goto("/user");
     }, 1500);
   }
 </script>
 
-<div class="light-gradient-bg">
-  <a href="/" class="btn-back-home">
-    <span class="arrow">←</span> Back to Home
+<svelte:head><title>Login | Khwarizmi Academy</title></svelte:head>
+
+<div class="min-h-screen w-full bg-[#fff7ed] flex items-center justify-center p-6 relative overflow-hidden font-sans selection:bg-orange-100">
+  <div class="absolute top-0 left-0 w-96 h-96 bg-orange-200/20 blur-[100px] -translate-x-1/2 -translate-y-1/2"></div>
+  <div class="absolute bottom-0 right-0 w-96 h-96 bg-orange-300/20 blur-[100px] translate-x-1/2 translate-y-1/2"></div>
+
+  <a href="/" class="absolute top-8 left-8 flex items-center gap-2 bg-white px-5 py-2.5 rounded-full text-sm font-bold text-slate-600 shadow-sm border border-slate-100 transition-all hover:-translate-x-1 hover:text-orange-600 z-50">
+    <span>←</span> Back to Home
   </a>
 
-  <div class="content-grid">
-    <div class="text-section">
-      <div class="brand">
-        <img src="logo.jpg" alt="Logo Khwarizmi Academy" class="brand-logo" />
-        <span class="brand-name">Khwarizmi <span>Academy</span></span>
+  <div class="w-full max-w-5xl grid lg:grid-cols-2 gap-16 items-center relative z-10">
+    <div class="hidden lg:block space-y-8" in:fade={{ duration: 600 }}>
+      <div class="flex items-center gap-3">
+        <img src="/logo.jpg" alt="Logo" class="h-12 w-auto rounded-xl shadow-sm" />
+        <div class="flex flex-col leading-none">
+          <span class="text-xl font-black text-slate-900 tracking-tight">KHWARIZMI</span>
+          <span class="text-sm font-bold text-orange-500 uppercase tracking-widest">Academy</span>
+        </div>
       </div>
 
-      <div class="hero-text">
-        <h3>Assalamualaikum! 👋</h3>
-        <h1>Join The Learning <br />Revolution Today.</h1>
-        <p>Akses ribuan materi pembelajaran, tugas, dan mentor profesional hanya dalam satu akun terintegrasi.</p>
+      <div class="space-y-6">
+        <h3 class="text-2xl font-semibold text-slate-500">Assalamualaikum! 👋</h3>
+        <h1 class="text-7xl font-black leading-[1.05] tracking-tighter text-slate-900">
+          Join The <br />Learning <span class="text-orange-500 italic">Revolution.</span>
+        </h1>
+        <p class="text-lg text-slate-500 leading-relaxed max-w-md">Akses ribuan materi pembelajaran, tugas, dan mentor profesional hanya dalam satu akun terintegrasi.</p>
       </div>
     </div>
 
-    <div class="card-section">
-      <div class="login-card">
-        <div class="card-header">
-          <h3>Welcome Back</h3>
-          <p>Masukkan akunmu untuk mulai belajar.</p>
+    <div class="flex justify-center lg:justify-end" in:fly={{ y: 20, duration: 800 }}>
+      <div class="w-full max-w-md bg-white rounded-[2.5rem] p-10 shadow-2xl shadow-orange-900/5 border border-white/50">
+        <div class="text-center mb-10">
+          <h3 class="text-3xl font-black text-slate-900 mb-2">Welcome Back</h3>
+          <p class="text-slate-400 text-sm font-medium">Masukkan akunmu untuk mulai belajar.</p>
         </div>
 
-        <form on:submit|preventDefault={handleLogin}>
-          <div class="input-block">
-            <input type="email" placeholder="Email Address" bind:value={email} required />
+        <form onsubmit={handleLogin} class="space-y-4">
+          <div class="space-y-1">
+            <input
+              type="email"
+              placeholder="Email Address"
+              bind:value={email}
+              class="w-full px-6 py-4 rounded-full bg-slate-50 border border-slate-100 outline-none focus:border-orange-500 focus:bg-white focus:ring-4 focus:ring-orange-500/10 transition-all font-medium"
+              required
+            />
           </div>
-          <div class="input-block">
-            <input type="password" placeholder="Password" bind:value={password} required />
+          <div class="space-y-1">
+            <input
+              type="password"
+              placeholder="Password"
+              bind:value={password}
+              class="w-full px-6 py-4 rounded-full bg-slate-50 border border-slate-100 outline-none focus:border-orange-500 focus:bg-white focus:ring-4 focus:ring-orange-500/10 transition-all font-medium"
+              required
+            />
           </div>
 
-          <div class="forgot-pass">
-            <a href="#">Lupa Password?</a>
+          <div class="text-right">
+            <a href="/forgot" class="text-sm font-bold text-orange-600 hover:text-orange-700 transition-colors">Lupa Password?</a>
           </div>
 
-          <button type="submit" class="btn-primary" disabled={isLoading}>
-            {#if isLoading}
-              Loading...
-            {:else}
-              Login
-            {/if}
+          <button
+            type="submit"
+            disabled={isLoading}
+            class="w-full bg-orange-500 py-4 rounded-full text-white font-black text-lg shadow-xl shadow-orange-200 hover:bg-orange-600 hover:-translate-y-1 active:scale-95 transition-all disabled:bg-slate-300 disabled:shadow-none"
+          >
+            {isLoading ? "Processing..." : "Login Now"}
           </button>
         </form>
 
-        <div class="divider">
-          <span>OR</span>
+        <div class="relative my-8 text-center">
+          <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-100"></div></div>
+          <span class="relative bg-white px-4 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">OR</span>
         </div>
 
-        <div class="social-row">
-          <button class="btn-soc google">
-            <span class="g-icon">G</span> Google
+        <div class="grid grid-cols-2 gap-4 mb-8">
+          <button class="flex items-center justify-center gap-3 py-3 border border-slate-100 rounded-full font-bold text-slate-600 text-sm hover:bg-slate-50 transition-all">
+            <span class="text-red-500">G</span> Google
           </button>
-          <button class="btn-soc fb">
-            <span class="f-icon">f</span> Facebook
+          <button class="flex items-center justify-center gap-3 py-3 border border-slate-100 rounded-full font-bold text-slate-600 text-sm hover:bg-slate-50 transition-all">
+            <span class="text-blue-600">f</span> Facebook
           </button>
         </div>
 
-        <div class="card-footer">
-          Don't have an account? <a href="#">Sign Up</a>
-        </div>
+        <p class="text-center text-sm font-medium text-slate-400">
+          Don't have an account? <a href="/register" class="text-orange-600 font-bold hover:underline">Sign Up</a>
+        </p>
       </div>
     </div>
   </div>
 </div>
-
-<style>
-  :global(body) {
-    margin: 0;
-    font-family: "Poppins", sans-serif;
-  }
-
-  /* --- BACKGROUND BARU: DOMINAN PUTIH + GRADASI ORANGE HALUS --- */
-  .light-gradient-bg {
-    min-height: 100vh;
-    width: 100%;
-    background-color: #fff7ed;
-    background-image: radial-gradient(at 0% 0%, rgba(255, 166, 0, 0.15) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(251, 146, 60, 0.15) 0px, transparent 50%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    box-sizing: border-box;
-    position: relative; /* Penting untuk tombol back absolute */
-    overflow: hidden;
-  }
-
-  /* --- STYLE TOMBOL BACK --- */
-  .btn-back-home {
-    position: absolute;
-    top: 30px;
-    left: 40px;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: white;
-    padding: 10px 20px;
-    border-radius: 50px;
-    color: #4b5563;
-    font-weight: 600;
-    font-size: 0.95rem;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
-    z-index: 10; /* Pastikan tombol di atas elemen lain */
-  }
-
-  .btn-back-home:hover {
-    color: #f97316;
-    transform: translateX(-5px); /* Efek geser sedikit ke kiri saat hover */
-    box-shadow: 0 6px 20px rgba(249, 115, 22, 0.15);
-  }
-
-  .btn-back-home .arrow {
-    font-size: 1.2rem;
-    line-height: 1;
-    padding-bottom: 2px;
-  }
-
-  /* GRID LAYOUT (KIRI TEKS, KANAN KARTU) */
-  .content-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    width: 100%;
-    max-width: 1100px;
-    gap: 50px;
-    align-items: center;
-  }
-
-  /* --- KIRI: TEKS (WARNA GELAP BIAR KELIATAN DI BG TERANG) --- */
-  .text-section {
-    color: #1f2937;
-    padding-left: 20px;
-  }
-
-  /* Mengatur font agar modern */
-
-  .brand {
-    display: flex;
-    align-items: center;
-    gap: 12px; /* Jarak antara logo dan teks */
-    text-decoration: none; /* Jika nanti dibungkus tag <a> */
-    font-family: "Poppins", sans-serif;
-    margin-bottom: 1rem;
-  }
-
-  .brand-logo {
-    height: 42px; /* Ukuran logo yang pas */
-    width: auto;
-    object-fit: contain;
-  }
-
-  /* Teks Utama "Khwarizmi" */
-  .brand-name {
-    font-size: 1.35rem;
-    font-weight: 700; /* Bold */
-    color: #0c2e28; /* Warna Dark Teal (Gelap) */
-    letter-spacing: -0.5px;
-    line-height: 1;
-    display: flex;
-    flex-direction: column; /* Opsional: jika ingin numpuk saat layar kecil */
-  }
-
-  /* Teks "Academy" (Target SPAN di dalam brand-name) */
-  .brand-name span {
-    color: #f67d26; /* Warna Oranye dari Logo */
-    font-weight: 400; /* Opsional: Membuat 'Academy' lebih tipis agar kontras */
-    /* Atau biarkan bold (700) jika ingin tebal semua */
-  }
-
-  /* Responsif untuk layar kecil (HP) */
-  @media (max-width: 768px) {
-    .brand-logo {
-      height: 35px;
-    }
-    .brand-name {
-      font-size: 1.1rem;
-    }
-  }
-
-  .hero-text h3 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    opacity: 0.9;
-    margin: 0 0 10px 0;
-    letter-spacing: 1px;
-    color: #4b5563;
-  }
-  .hero-text h1 {
-    font-size: 3.5rem;
-    font-weight: 800;
-    line-height: 1.1;
-    margin: 0 0 20px 0;
-    letter-spacing: -1px;
-    color: #111827;
-  }
-  .hero-text p {
-    font-size: 1rem;
-    opacity: 0.8;
-    max-width: 80%;
-    line-height: 1.6;
-    color: #6b7280;
-  }
-
-  /* --- KANAN: KARTU LOGIN (PUTIH BERSIH) --- */
-  .card-section {
-    display: flex;
-    justify-content: flex-end;
-  }
-
-  .login-card {
-    background: white;
-    width: 100%;
-    max-width: 400px;
-    border-radius: 30px;
-    padding: 40px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-  }
-
-  .card-header {
-    text-align: center;
-    margin-bottom: 30px;
-  }
-  .card-header h3 {
-    font-size: 1.8rem;
-    color: #1e293b;
-    margin: 0 0 8px 0;
-  }
-  .card-header p {
-    color: #64748b;
-    margin: 0;
-    font-size: 0.95rem;
-  }
-
-  .input-block {
-    margin-bottom: 15px;
-  }
-  .input-block input {
-    width: 100%;
-    padding: 16px 20px;
-    border: 1px solid #e2e8f0;
-    border-radius: 50px;
-    font-size: 1rem;
-    box-sizing: border-box;
-    transition: 0.2s;
-    background: #f8fafc;
-  }
-  .input-block input:focus {
-    outline: none;
-    border-color: #f97316;
-    background: white;
-    box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.1);
-  }
-
-  .forgot-pass {
-    text-align: right;
-    margin-bottom: 25px;
-    font-size: 0.9rem;
-  }
-  .forgot-pass a {
-    color: #f97316;
-    text-decoration: none;
-    font-weight: 600;
-  }
-
-  .btn-primary {
-    width: 100%;
-    padding: 16px;
-    border-radius: 50px;
-    background: #f97316;
-    color: white;
-    border: none;
-    font-size: 1.1rem;
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow: 0 10px 20px rgba(249, 115, 22, 0.3);
-    transition: 0.2s;
-  }
-  .btn-primary:hover {
-    background: #c2410c;
-    transform: translateY(-2px);
-  }
-
-  .divider {
-    text-align: center;
-    margin: 25px 0;
-    position: relative;
-  }
-  .divider::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 0;
-    width: 100%;
-    height: 1px;
-    background: #e2e8f0;
-  }
-  .divider span {
-    background: white;
-    padding: 0 10px;
-    color: #94a3b8;
-    font-size: 0.8rem;
-    position: relative;
-    z-index: 1;
-  }
-
-  .social-row {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 30px;
-  }
-  .btn-soc {
-    flex: 1;
-    padding: 12px;
-    border: 1px solid #e2e8f0;
-    border-radius: 50px;
-    background: white;
-    cursor: pointer;
-    font-weight: 600;
-    color: #475569;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    transition: 0.2s;
-  }
-  .btn-soc:hover {
-    background: #f1f5f9;
-    border-color: #cbd5e1;
-  }
-  .g-icon {
-    color: #ea4335;
-    font-weight: bold;
-  }
-  .f-icon {
-    color: #1877f2;
-    font-weight: bold;
-  }
-
-  .card-footer {
-    text-align: center;
-    font-size: 0.9rem;
-    color: #64748b;
-  }
-  .card-footer a {
-    color: #f97316;
-    font-weight: 700;
-    text-decoration: none;
-  }
-
-  /* RESPONSIVE HP */
-  @media (max-width: 900px) {
-    .content-grid {
-      grid-template-columns: 1fr;
-      gap: 30px;
-      text-align: center;
-      margin-top: 60px; /* Tambah jarak atas agar tidak nabrak tombol back */
-    }
-    .text-section {
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .hero-text h1 {
-      font-size: 2.5rem;
-    }
-    .hero-text p {
-      margin: 0 auto;
-    }
-    .card-section {
-      justify-content: center;
-    }
-
-    /* Penyesuaian tombol back di HP */
-    .btn-back-home {
-      left: 20px;
-      top: 20px;
-      font-size: 0.85rem;
-      padding: 8px 15px;
-    }
-  }
-</style>

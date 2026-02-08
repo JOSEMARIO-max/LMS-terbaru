@@ -1,56 +1,45 @@
-<script>
-  // 1. IMPORT LIB & STORE
-  import { user, isPremium, ownedCourses } from "$lib/stores";
-  import { goto } from "$app/navigation";
-  import toast, { Toaster } from 'svelte-french-toast';
-  import { fade, scale } from 'svelte/transition';
+<script lang="ts">
+  import { fade, scale } from "svelte/transition";
+  import toast, { Toaster } from "svelte-french-toast";
+  // Jika menggunakan SvelteKit, gunakan alias $lib atau import path yang sesuai
+  // Di Svelte 5, kita bisa menggunakan runes untuk state global atau lokal
 
-  // 2. STATE UNTUK MODAL PEMBAYARAN
-  let showPaymentModal = false;
-  let selectedPayment = 'bca'; // Default method
-  let isLoading = false;
+  /* --- SVELTE 5 RUNES (STATE) --- */
+  let showPaymentModal = $state(false);
+  let selectedPayment = $state("bca");
+  let isLoading = $state(false);
 
-  // 3. LOGIC BUKA MODAL
+  // Simulasi state user (biasanya dari context atau store)
+  let isPremium = $state(false);
+
+  /* --- LOGIC --- */
   function openPaymentModal() {
-    // Cek jika user sudah Premium
-    if ($isPremium) {
-      toast.success("Akun kamu sudah PRO (Active)!", { icon: '✅' });
-      setTimeout(() => goto('/lesson'), 1000);
+    if (isPremium) {
+      toast.success("Akun kamu sudah PRO (Active)!", { icon: "✅" });
+      // Ganti dengan logic navigasi Anda
       return;
     }
-    // Buka Modal
     showPaymentModal = true;
   }
 
-  // 4. LOGIC PROSES BAYAR (SIMULASI)
-  function processPayment() {
-    showPaymentModal = false; // Tutup modal
+  async function processPayment() {
+    showPaymentModal = false;
     isLoading = true;
-    
-    // Tampilkan Loading Toast
+
     const loadingId = toast.loading("Menghubungkan ke Payment Gateway...");
 
+    // Simulasi Delay Network
     setTimeout(() => {
-        // A. UPDATE STORE (JADI PREMIUM)
-        $isPremium = true;
-        $user.role = "PRO Member";
-        // Unlock semua kursus (ID 1-8)
-        $ownedCourses = [1, 2, 3, 4, 5, 6, 7, 8]; 
+      isPremium = true;
+      isLoading = false;
+      toast.dismiss(loadingId);
 
-        isLoading = false;
-        toast.dismiss(loadingId);
+      toast.success(`Pembayaran via ${selectedPayment.toUpperCase()} Berhasil!`, {
+        duration: 5000,
+        icon: "🎉",
+      });
 
-        // B. TOAST SUKSES
-        toast.success(`Pembayaran via ${selectedPayment.toUpperCase()} Berhasil!`, {
-            duration: 5000,
-            icon: '🎉',
-            style: 'font-weight: bold; background: #fff; color: #333;'
-        });
-        
-        // C. REDIRECT KE DASHBOARD
-        setTimeout(() => { 
-            goto('/lesson'); 
-        }, 2000);
+      // Redirect logic di sini
     }, 2500);
   }
 </script>
@@ -58,164 +47,105 @@
 <Toaster />
 
 {#if showPaymentModal}
-  <div class="modal-overlay" transition:fade={{ duration: 200 }}>
-    <div class="payment-box" transition:scale={{ duration: 200, start: 0.95 }}>
-      
-      <div class="pay-header">
-        <h3>Checkout PRO 💎</h3>
-        <button class="close-x" on:click={() => showPaymentModal = false}>✕</button>
+  <div class="fixed inset-0 z-[9999] grid place-items-center bg-black/60 p-4 backdrop-blur-sm" transition:fade={{ duration: 200 }}>
+    <div class="relative w-full max-w-md overflow-hidden rounded-[2rem] bg-white shadow-2xl" transition:scale={{ duration: 200, start: 0.95 }}>
+      <div class="flex items-center justify-between bg-orange-50 px-6 py-5">
+        <h3 class="font-bold text-orange-900 text-lg">Checkout PRO 💎</h3>
+        <button class="text-2xl text-orange-900 transition-hover hover:rotate-90" onclick={() => (showPaymentModal = false)}> ✕ </button>
       </div>
 
-      <div class="pay-summary">
-        <div class="row">
-            <span>Paket Langganan</span>
-            <strong>Bulanan (Auto-renew)</strong>
+      <div class="border-b border-gray-100 bg-gray-50 px-8 py-6">
+        <div class="flex justify-between text-sm text-gray-500 mb-2">
+          <span>Paket Langganan</span>
+          <strong class="text-gray-900">Bulanan (PRO)</strong>
         </div>
-        <div class="row total">
-            <span>Total Tagihan</span>
-            <span class="price-tag">Rp 150.000</span>
-        </div>
-      </div>
-
-      <div class="pay-method-section">
-        <label>Pilih Metode Pembayaran</label>
-        <div class="method-grid">
-            <button class="method-card {selectedPayment === 'bca' ? 'selected' : ''}" on:click={() => selectedPayment = 'bca'}>
-                <div class="logo-placeholder bca">BCA</div>
-                <span>Virtual Account</span>
-                {#if selectedPayment === 'bca'} <div class="check">✓</div> {/if}
-            </button>
-
-            <button class="method-card {selectedPayment === 'mandiri' ? 'selected' : ''}" on:click={() => selectedPayment = 'mandiri'}>
-                <div class="logo-placeholder mandiri">MANDIRI</div>
-                <span>Virtual Account</span>
-                {#if selectedPayment === 'mandiri'} <div class="check">✓</div> {/if}
-            </button>
-
-            <button class="method-card {selectedPayment === 'card' ? 'selected' : ''}" on:click={() => selectedPayment = 'card'}>
-                <div class="logo-placeholder card">💳</div>
-                <span>Debit / Credit</span>
-                {#if selectedPayment === 'card'} <div class="check">✓</div> {/if}
-            </button>
-
-            <button class="method-card {selectedPayment === 'gopay' ? 'selected' : ''}" on:click={() => selectedPayment = 'gopay'}>
-                <div class="logo-placeholder gopay">GOPAY</div>
-                <span>E-Wallet</span>
-                {#if selectedPayment === 'gopay'} <div class="check">✓</div> {/if}
-            </button>
+        <div class="mt-4 flex items-center justify-between border-t border-dashed border-gray-300 pt-4">
+          <span class="text-lg font-bold text-gray-900">Total Tagihan</span>
+          <span class="text-2xl font-black text-orange-600">Rp 150.000</span>
         </div>
       </div>
 
-      <button class="btn-pay-now" on:click={processPayment}>
-        Bayar Sekarang 🔒
-      </button>
-      
-      <p class="secure-text">🔒 Pembayaran Anda dienkripsi dan aman.</p>
+      <div class="p-8">
+        <label class="mb-4 block text-sm font-bold text-gray-700">Pilih Metode Pembayaran</label>
+        <div class="grid grid-cols-2 gap-4">
+          {#each ["bca", "mandiri", "card", "gopay"] as method}
+            <button
+              class="relative flex flex-col items-center gap-2 rounded-2xl border-2 p-4 transition-all
+              {selectedPayment === method ? 'border-orange-500 bg-orange-50 shadow-md' : 'border-gray-100 hover:border-orange-200 hover:bg-orange-50/30'}"
+              onclick={() => (selectedPayment = method)}
+            >
+              <div
+                class="text-xs font-black tracking-widest uppercase
+                {method === 'bca' ? 'text-blue-700' : method === 'mandiri' ? 'text-yellow-600' : method === 'gopay' ? 'text-cyan-500' : 'text-gray-600'}"
+              >
+                {method === "card" ? "💳" : method}
+              </div>
+              <span class="text-[10px] font-medium text-gray-400">
+                {method === "card" ? "Debit/Credit" : method === "gopay" ? "E-Wallet" : "Virtual Account"}
+              </span>
+              {#if selectedPayment === method}
+                <div class="absolute top-2 right-2 flex h-4 w-4 items-center justify-center rounded-full bg-orange-500 text-[8px] text-white">✓</div>
+              {/if}
+            </button>
+          {/each}
+        </div>
+      </div>
+
+      <div class="px-8 pb-8">
+        <button class="w-full rounded-2xl bg-gray-900 py-4 font-bold text-white transition-all hover:bg-orange-600 active:scale-95 disabled:bg-gray-300" disabled={isLoading} onclick={processPayment}>
+          {isLoading ? "Memproses..." : "Bayar Sekarang 🔒"}
+        </button>
+        <p class="mt-4 text-center text-[10px] text-gray-400">🔒 Pembayaran terenkripsi dan aman.</p>
+      </div>
     </div>
   </div>
 {/if}
 
-<section class="pricing" id="pricing">
-  <div class="container">
-    <div class="section-head">
-      <div class="badge-pill orange">INVESTASI TERBAIK</div>
-      <h2>Metode Belajar Pilihanmu</h2>
-      <p>Pilih tipe kelas yang sesuai dengan gaya belajar dan budget kamu. Bayar sekali atau langganan hemat.</p>
+<section id="pricing" class="bg-white py-24">
+  <div class="container mx-auto px-6">
+    <div class="mb-16 text-center">
+      <span class="rounded-full bg-orange-100 px-4 py-1 text-xs font-bold text-orange-600">INVESTASI TERBAIK</span>
+      <h2 class="mt-4 text-4xl font-black text-gray-900">Metode Belajar Pilihanmu</h2>
+      <p class="mt-4 text-gray-500">Pilih tipe kelas yang sesuai dengan gaya belajar dan budget kamu.</p>
     </div>
 
-    <div class="pricing-grid">
-      
-      <div class="price-card">
-        <div class="plan-name">Video Course</div>
-        <div class="price">
-          <small style="font-size: 1rem; font-weight: 500;">Mulai dari</small><br />
-          Rp 99rb <span class="period">/ kursus</span>
+    <div class="grid gap-8 lg:grid-cols-3">
+      <div class="flex flex-col rounded-[2rem] border border-gray-100 bg-white p-10 transition-all hover:shadow-xl">
+        <h3 class="text-xl font-bold text-gray-900">Video Course</h3>
+        <div class="my-6">
+          <span class="text-sm font-medium text-gray-400">Mulai dari</span>
+          <div class="text-3xl font-black text-gray-900">Rp 99rb <span class="text-sm font-medium text-gray-400">/ kursus</span></div>
         </div>
-        <p class="desc">Cocok untuk kamu yang ingin mempelajari satu skill spesifik secara mandiri.</p>
-        <ul class="features-list">
-          <li>✅ Akses Video Selamanya</li>
-          <li>✅ Sertifikat Penyelesaian</li>
-          <li>✅ Forum Tanya Jawab</li>
-          <li>✅ Materi Praktik & Studi Kasus</li>
-          <li>❌ Akses Kursus Lain</li>
+        <ul class="mb-10 flex-1 space-y-4 text-sm text-gray-600">
+          <li class="flex items-center gap-3">✅ <span>Akses Video Selamanya</span></li>
+          <li class="flex items-center gap-3 text-gray-300">❌ <span>Akses Kursus Lain</span></li>
         </ul>
-        <a href="/courses" class="btn-outline-full">Lihat Katalog Kelas</a>
+        <a href="/courses" class="rounded-full border-2 border-gray-100 py-4 text-center font-bold text-gray-700 transition-hover hover:border-gray-900">Katalog Kelas</a>
       </div>
 
-      <div class="price-card pro-plan">
-        <div class="popular-badge">PALING HEMAT 🔥</div>
-        <div class="plan-name text-white">Khwarizmi PRO</div>
-        <div class="price text-white">
-          <small style="font-size: 1rem; font-weight: 500; opacity: 0.8;">Hanya</small><br />
-          Rp 150rb <span class="period text-white-50">/ bulan</span>
+      <div class="relative flex flex-col rounded-[2rem] bg-gray-900 p-10 text-white shadow-2xl shadow-orange-200 lg:scale-105">
+        <div class="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-orange-500 px-4 py-1 text-[10px] font-black tracking-widest">PALING HEMAT 🔥</div>
+        <h3 class="text-xl font-bold">Khwarizmi PRO</h3>
+        <div class="my-6 text-white">
+          <span class="text-sm font-medium opacity-60">Hanya</span>
+          <div class="text-3xl font-black">Rp 150rb <span class="text-sm font-medium opacity-50">/ bulan</span></div>
         </div>
-        <p class="desc text-white-80">Akses tanpa batas ke seluruh materi di platform ini. Lebih hemat, belajar sepuasnya.</p>
-        <ul class="features-list text-white">
-          <li>✅ <strong>Akses SEMUA 8+ Kursus</strong></li>
-          <li>✅ <strong>Download Source Code</strong></li>
-          <li>✅ Prioritas Review Tugas</li>
-          <li>✅ Konsultasi Mentor</li>
-          <li>✅ Sertifikat Jalur Karir</li>
+        <ul class="mb-10 flex-1 space-y-4 text-sm opacity-90">
+          <li class="flex items-center gap-3">✅ <strong>Akses SEMUA 8+ Kursus</strong></li>
+          <li class="flex items-center gap-3">✅ Sertifikat Jalur Karir</li>
         </ul>
-        
-        <button class="btn-white-full" on:click={openPaymentModal} style="width: 100%; border: none; cursor: pointer; font-size: 1rem; font-weight: 700;">
-          Langganan Sekarang 🚀
-        </button>
+        <button onclick={openPaymentModal} class="rounded-full bg-white py-4 font-bold text-orange-600 transition-all hover:scale-105 active:scale-95"> Langganan Sekarang 🚀 </button>
       </div>
 
-      <div class="price-card">
-        <div class="plan-name">Career Bundling</div>
-        <div class="price">
-          <small style="font-size: 1rem; font-weight: 500;">Hemat hingga</small><br />
-          30% <span class="period">OFF</span>
+      <div class="flex flex-col rounded-[2rem] border border-gray-100 bg-white p-10 transition-all hover:shadow-xl">
+        <h3 class="text-xl font-bold text-gray-900">Career Bundling</h3>
+        <div class="my-6">
+          <span class="text-sm font-medium text-gray-400">Hemat hingga</span>
+          <div class="text-3xl font-black text-gray-900">30% <span class="text-sm font-medium text-gray-400">OFF</span></div>
         </div>
-        <p class="desc">Paket lengkap dari nol sampai mahir. Gabungan beberapa materi menjadi satu alur belajar.</p>
-        <ul class="features-list">
-          <li>✅ Gabungan 3-5 Video Course</li>
-          <li>✅ Roadmap Belajar Terstruktur</li>
-          <li>✅ Portfolio Project Akhir</li>
-          <li>✅ Sertifikat Jalur Karir</li>
-          <li>✅ Akses Seumur Hidup</li>
-        </ul>
-        <a href="/courses" class="btn-outline-full">Lihat Paket Bundling</a>
+        <p class="mb-10 text-sm text-gray-500">Paket lengkap dari nol sampai mahir dengan alur terstruktur.</p>
+        <a href="/courses" class="rounded-full border-2 border-gray-100 py-4 text-center font-bold text-gray-700 hover:border-gray-900">Paket Bundling</a>
       </div>
-
     </div>
   </div>
 </section>
-
-<style>
-  /* --- STYLE MODAL PEMBAYARAN --- */
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 9999; display: grid; place-items: center; padding: 20px; }
-  
-  .payment-box { background: white; width: 100%; max-width: 450px; border-radius: 24px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); position: relative; font-family: 'Plus Jakarta Sans', sans-serif; text-align: left; }
-  
-  .pay-header { padding: 20px 25px; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center; background: #fff7ed; }
-  .pay-header h3 { margin: 0; font-size: 1.1rem; color: #9a3412; }
-  .close-x { background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: #9a3412; font-weight: bold; }
-  
-  .pay-summary { padding: 25px; background: #f9fafb; border-bottom: 1px solid #f3f4f6; }
-  .row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; color: #4b5563; }
-  .row.total { margin-top: 15px; border-top: 1px dashed #d1d5db; padding-top: 15px; align-items: center; }
-  .row.total span { font-weight: 700; font-size: 1.1rem; color: #1f2937; }
-  .price-tag { color: #ea580c !important; font-size: 1.3rem !important; }
-
-  .pay-method-section { padding: 25px; }
-  .pay-method-section label { display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 15px; color: #374151; }
-  
-  .method-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-  .method-card { border: 2px solid #e5e7eb; background: white; border-radius: 12px; padding: 15px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative; transition: 0.2s; }
-  .method-card:hover { border-color: #fdba74; background: #fff7ed; }
-  .method-card.selected { border-color: #f97316; background: #fff7ed; box-shadow: 0 4px 6px -1px rgba(249, 115, 22, 0.1); }
-  
-  .logo-placeholder { font-weight: 900; font-size: 0.8rem; letter-spacing: 1px; }
-  .bca { color: #00529C; } .mandiri { color: #FFB700; } .card { font-size: 1.5rem; } .gopay { color: #00AED6; }
-  .method-card span { font-size: 0.75rem; color: #6b7280; }
-  
-  .check { position: absolute; top: 5px; right: 5px; width: 18px; height: 18px; background: #f97316; color: white; border-radius: 50%; font-size: 0.7rem; display: grid; place-items: center; font-weight: bold; }
-
-  .btn-pay-now { width: calc(100% - 50px); margin: 0 25px 15px 25px; padding: 14px; background: #111827; color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 1rem; transition: 0.2s; }
-  .btn-pay-now:hover { background: #ea580c; transform: translateY(-2px); }
-  
-  .secure-text { text-align: center; font-size: 0.75rem; color: #9ca3af; margin-bottom: 25px; }
-</style>
