@@ -1,8 +1,7 @@
 <script lang="ts">
-  // Import CSS terpisah agar lebih rapi
   import "./navbar.css";
 
-  // State untuk menu mobile (Svelte 4/5 compatible)
+  // State untuk menu mobile
   let isMenuOpen = false;
 
   function toggleMenu() {
