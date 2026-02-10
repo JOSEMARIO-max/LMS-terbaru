@@ -1,12 +1,13 @@
 <script lang="ts">
-  import { page } from "$app/state"; // Menggunakan state Svelte 5
+  import { page } from "$app/state"; 
   import { tasks } from "$lib/stores";
   import { fade, fly } from "svelte/transition";
+  import { cubicOut } from "svelte/easing";
 
   // --- SVELTE 5 STATE & DERIVED ---
   const taskId = $derived(page.params.id);
 
-  // Mencari data tugas secara reaktif menggunakan $derived
+  // Mencari data tugas secara reaktif
   let task = $derived.by(() => {
     const found = $tasks.find((t) => t.id == taskId);
     return (
@@ -24,6 +25,10 @@
   // State UI
   let isDragging = $state(false);
   let fileUploaded = $state<File | null>(null);
+
+  // --- STATE UNTUK TOAST ---
+  let showToast = $state(false);
+  let toastMessage = $state("");
 
   // --- ACTIONS ---
   function handleDrop(e: DragEvent) {
@@ -43,18 +48,43 @@
 
   function submitAssignment() {
     if (!fileUploaded) return;
-    // Logika update status tugas di sini
-    alert(`Sukses mengirim: ${fileUploaded.name}`);
+    
+    // 1. Set pesan toast
+    toastMessage = `Berhasil mengirim: ${fileUploaded.name}`;
+    
+    // 2. Tampilkan toast
+    showToast = true;
+
+    // 3. Hilangkan otomatis setelah 3 detik
+    setTimeout(() => {
+      showToast = false;
+    }, 3000);
   }
 </script>
 
-<div class="max-w-6xl mx-auto px-6 py-10 pb-24 font-plus">
+<div class="max-w-6xl mx-auto px-6 py-10 pb-24 font-plus relative">
+
+  {#if showToast}
+    <div 
+      transition:fly={{ y: 50, duration: 300, easing: cubicOut }}
+      class="fixed bottom-10 right-10 z-50 flex items-center gap-4 bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl shadow-slate-900/20 border border-slate-700"
+    >
+      <div class="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-white shadow-lg shadow-emerald-500/30">
+        <span class="text-sm font-bold">✓</span>
+      </div>
+      <div>
+        <h4 class="text-sm font-black text-emerald-400">Submission Success!</h4>
+        <p class="text-xs font-medium text-slate-300">{toastMessage}</p>
+      </div>
+    </div>
+  {/if}
   <a href="/user/assignments" class="group inline-flex items-center gap-2 text-slate-400 font-bold text-sm mb-8 transition-all hover:text-kh-orange">
     <span class="transition-transform group-hover:-translate-x-1">←</span>
     Back to Assignments
   </a>
 
   <div class="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8">
+    
     <div class="space-y-6">
       <div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
         <div class="flex flex-wrap gap-3 mb-6">
@@ -138,7 +168,7 @@
         {:else}
           <div
             class={`border-2 border-dashed rounded-[2rem] p-8 text-center transition-all duration-300
-              ${isDragging ? "border-kh-orange bg-orange-50" : "border-slate-200 bg-slate-50/50"}`}
+            ${isDragging ? "border-kh-orange bg-orange-50" : "border-slate-200 bg-slate-50/50"}`}
             ondragover={(e) => {
               e.preventDefault();
               isDragging = true;
@@ -184,7 +214,3 @@
     </aside>
   </div>
 </div>
-
-<style>
-  /* Menjaga styling khusus jika diperlukan, namun mayoritas sudah ditangani Tailwind v4 */
-</style>

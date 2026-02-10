@@ -49,13 +49,13 @@
 
     <div class="absolute top-0 left-0 z-20 h-1/2 w-full border-b border-gray-100 bg-white overflow-hidden" style="transform: translateY(-{splitProgress * 100}%);">
       <div class="absolute bottom-0 left-0 w-full translate-y-1/2 text-center">
-        <h1 class="text-[10vw] font-black leading-none tracking-tighter text-[#f67d26] select-none uppercase">ARE YOU READY?</h1>
+        <h1 class="text-[10vw] font-black leading-none tracking-tighter text-[#f67d26] select-none uppercase">ARE YOU READY ?</h1>
       </div>
     </div>
 
     <div class="absolute bottom-0 left-0 z-20 h-1/2 w-full border-t border-gray-100 bg-white overflow-hidden" style="transform: translateY({splitProgress * 100}%);">
       <div class="absolute top-0 left-0 w-full -translate-y-1/2 text-center">
-        <h1 class="text-[10vw] font-black leading-none tracking-tighter text-[#f67d26] select-none uppercase">ARE YOU READY?</h1>
+        <h1 class="text-[10vw] font-black leading-none tracking-tighter text-[#f67d26] select-none uppercase">ARE YOU READY ?</h1>
       </div>
     </div>
   </div>

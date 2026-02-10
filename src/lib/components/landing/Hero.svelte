@@ -2,6 +2,8 @@
   import { onMount } from "svelte";
 
   const words = ["Web Development", "UI/UX DESIGN", "Animation", "Videography", "Frontend Development", "Backend Development"];
+  
+  // Menggunakan $state untuk Svelte 5
   let currentText = $state("");
   let wordIndex = $state(0);
   let isDeleting = $state(false);
@@ -41,43 +43,49 @@
 
   <div class="container mx-auto px-6 relative z-10">
     <div class="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+      
       <div class="text-center lg:text-left">
         <div class="mb-6 flex justify-center lg:justify-start">
-          <span class="inline-flex items-center gap-2 rounded-full border border-orange-100 bg-orange-50/50 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-kh-orange">
+          <span class="inline-flex items-center gap-2 rounded-full border border-orange-100 bg-orange-50/50 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-[#f67d26]">
             <span class="relative flex h-2 w-2">
               <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-400 opacity-75"></span>
-              <span class="relative inline-flex h-2 w-2 rounded-full bg-kh-orange"></span>
+              <span class="relative inline-flex h-2 w-2 rounded-full bg-[#f67d26]"></span>
             </span>
             Accelerate Your Career
           </span>
         </div>
 
-        <h1 class="mb-6 text-4xl font-black leading-[1.1] tracking-tight text-kh-dark sm:text-5xl lg:mb-8 lg:text-6xl lg:leading-[1.15]">
+        <h1 class="mb-6 text-4xl font-black leading-[1.1] tracking-tight text-gray-900 sm:text-5xl lg:mb-8 lg:text-6xl lg:leading-[1.15]">
           Mau Belajar <br />
-          <span class="relative inline-block text-kh-orange italic">
+          <span class="relative inline-block text-[#f67d26] italic">
             {currentText}
-            <span class="absolute -right-1 top-0 h-[85%] w-[2px] animate-[blink_1s_infinite] bg-kh-dark opacity-20"></span>
+            <span class="absolute -right-1 top-0 h-[85%] w-[2px] animate-[blink_1s_infinite] bg-gray-900 opacity-20"></span>
           </span>
           <br />
           Jadi Lebih Mudah.
         </h1>
 
-        <p class="mx-auto mb-10 max-w-md text-base leading-relaxed text-kh-gray/80 sm:text-lg lg:mx-0 lg:mb-12 lg:max-w-lg">
+        <p class="mx-auto mb-10 max-w-md text-base leading-relaxed text-gray-500 sm:text-lg lg:mx-0 lg:mb-12 lg:max-w-lg">
           Kuasai keahlian digital masa depan melalui kurikulum berbasis industri yang dirancang oleh praktisi berpengalaman.
         </p>
 
         <div class="flex flex-col items-center gap-4 sm:flex-row sm:justify-center lg:justify-start">
+          
           <a
             href="/login"
-            class="w-full rounded-full bg-kh-orange px-8 py-3.5 text-center text-sm font-bold text-white shadow-lg shadow-orange-200/50 transition-all hover:bg-orange-600 hover:shadow-orange-300/50 active:scale-95 sm:w-auto lg:px-9 lg:py-4"
+            class="w-full rounded-full bg-[#f67d26] px-8 py-3.5 text-center text-sm font-bold text-white shadow-lg shadow-orange-200/50 transition-all hover:bg-orange-600 hover:shadow-orange-300/50 active:scale-95 sm:w-auto lg:px-9 lg:py-4"
           >
             Mulai Belajar Sekarang
           </a>
 
-          <button class="flex w-full items-center justify-center gap-3 rounded-full border border-gray-100 bg-white px-8 py-3.5 text-sm font-bold text-kh-dark transition-all hover:bg-gray-50 active:scale-95 sm:w-auto lg:px-9 lg:py-4">
-            <span class="flex h-5 w-5 items-center justify-center rounded-full bg-orange-50 text-[9px] text-kh-orange">▶</span>
+          <a
+            href="/categories"
+            class="flex w-full items-center justify-center gap-3 rounded-full border border-gray-100 bg-white px-8 py-3.5 text-sm font-bold text-gray-800 transition-all hover:bg-gray-50 active:scale-95 sm:w-auto lg:px-9 lg:py-4"
+          >
+            <span class="flex h-5 w-5 items-center justify-center rounded-full bg-orange-50 text-[9px] text-[#f67d26]">▶</span>
             Eksplorasi Kelas
-          </button>
+          </a>
+
         </div>
       </div>
 
@@ -92,10 +100,10 @@
           <div class="absolute -left-10 top-12 z-20 flex animate-[float_6s_ease-in-out_infinite] items-center gap-4 rounded-2xl border border-white/40 bg-white/80 p-4 shadow-xl backdrop-blur-md">
             <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-50 text-xl">🎨</div>
             <div>
-              <p class="text-[9px] font-bold uppercase tracking-widest text-kh-gray/60">Program</p>
-              <h4 class="text-sm font-bold text-kh-dark leading-none">UI Design</h4>
+              <p class="text-[9px] font-bold uppercase tracking-widest text-gray-400">Program</p>
+              <h4 class="text-sm font-bold text-gray-900 leading-none">UI Design</h4>
               <div class="mt-2 h-1 w-20 rounded-full bg-gray-100 overflow-hidden">
-                <div class="h-full w-[85%] rounded-full bg-kh-orange"></div>
+                <div class="h-full w-[85%] rounded-full bg-[#f67d26]"></div>
               </div>
             </div>
           </div>
@@ -105,35 +113,26 @@
               <span class="text-[10px]">✓</span>
             </div>
             <div>
-              <p class="text-xs font-bold text-kh-dark leading-none">Level Up!</p>
+              <p class="text-xs font-bold text-gray-900 leading-none">Level Up!</p>
               <p class="mt-1 text-[8px] font-bold text-emerald-600 uppercase tracking-tighter">Skill Unlocked</p>
             </div>
           </div>
         </div>
       </div>
+
     </div>
   </div>
 </header>
 
 <style>
   @keyframes blink {
-    0%,
-    100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0;
-    }
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
   }
 
   @keyframes float {
-    0%,
-    100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
   }
 
   :global(body) {
@@ -141,6 +140,7 @@
     background-color: white;
   }
 
+  /* Utility agar container rapi */
   .container {
     max-width: 1140px;
   }
