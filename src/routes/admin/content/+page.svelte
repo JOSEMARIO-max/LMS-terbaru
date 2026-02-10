@@ -160,7 +160,7 @@
 </div>
 
 {#if isDeleteModalOpen}
-  <div class="fixed inset-0 z-[120] flex items-center justify-center p-6">
+  <div class="fixed inset-0 z-120 flex items-center justify-center p-6">
     <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" transition:fade onclick={() => (isDeleteModalOpen = false)}></div>
     <div class="bg-white w-full max-w-sm rounded-[3.5rem] p-10 relative z-[130] shadow-2xl border border-rose-50 text-center" in:fly={{ y: 20 }} out:scale={{ start: 0.9 }}>
       <div class="w-20 h-20 bg-rose-50 text-rose-500 rounded-[2.5rem] flex items-center justify-center text-4xl mx-auto mb-8 shadow-inner animate-pulse italic font-black">!</div>
