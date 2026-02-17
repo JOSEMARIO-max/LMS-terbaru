@@ -14,6 +14,7 @@
     if (path.includes("/content")) return "Content Manager";
     if (path.includes("/sales")) return "Sales Analytics";
     if (path.includes("/settings")) return "System Settings";
+    if (path.includes("/zoom")) return "Zoom Management";
     return "Admin Console";
   });
 
@@ -68,6 +69,7 @@
           <SidebarLink href="/admin" icon="📊" label="Dashboard" {isSidebarOpen} active={page.url.pathname === "/admin"} />
           <SidebarLink href="/admin/users" icon="👥" label="Siswa" {isSidebarOpen} active={page.url.pathname.startsWith("/admin/users")} />
           <SidebarLink href="/admin/content" icon="📁" label="Kursus" {isSidebarOpen} active={page.url.pathname.startsWith("/admin/content")} />
+          <SidebarLink href="/admin/zoom" icon=" 📹" label="Zoom" {isSidebarOpen} active={page.url.pathname.startsWith("/admin/zoom")} />
         </nav>
       </div>
 

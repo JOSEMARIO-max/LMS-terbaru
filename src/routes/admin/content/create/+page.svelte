@@ -9,11 +9,11 @@
   let description = $state("");
   let price = $state(150000);
 
-  // --- STATE MATERI (MULTIPLE VIDEOS) ---
-  let lessons = $state([{ id: 1, title: "", duration: "", file: null as File | null }]);
+  // --- STATE MATERI (URL VIDEO) ---
+  let lessons = $state([{ id: 1, title: "", url: "" }]);
 
   function addLesson() {
-    lessons = [...lessons, { id: Date.now(), title: "", duration: "", file: null }];
+    lessons = [...lessons, { id: Date.now(), title: "", url: "" }];
     toast.success("Baris materi baru ditambahkan", {
       icon: "📝",
       style: "border-radius: 15px; font-weight: 800; font-size: 13px; border: 1px solid #14B8A6; color: #0D9488;",
@@ -31,7 +31,7 @@
     }
   }
 
-  // --- HANDLE PUBLISH DENGAN TOAST LOADING ---
+  // --- HANDLE PUBLISH ---
   async function handleSave() {
     if (!courseTitle || !description) {
       toast.error("Mohon lengkapi judul dan deskripsi!", {
@@ -42,11 +42,17 @@
       return;
     }
 
-    const uploadToast = toast.loading("Sedang mengupload data kursus ke server Khwarizmi...");
+    // Validasi URL sederhana
+    const emptyUrl = lessons.find((l) => !l.url);
+    if (emptyUrl) {
+      toast.error("Semua URL video materi wajib diisi!");
+      return;
+    }
 
-    // Simulasi Proses Upload
+    const uploadToast = toast.loading("Sinkronisasi database Khwarizmi...");
+
     setTimeout(() => {
-      toast.success("Hampir selesai, memproses enkripsi video...", { id: uploadToast });
+      toast.success("Hampir selesai, memproses metadata...", { id: uploadToast });
 
       setTimeout(() => {
         toast.success("Kursus Berhasil Dipublish! 🚀", {
@@ -55,7 +61,6 @@
           style: "background: #0D9488; color: white; font-weight: 900;",
         });
 
-        // Pindah halaman setelah sukses
         goto("/admin/content");
       }, 1500);
     }, 2000);
@@ -103,7 +108,7 @@
           <div class="w-12 h-12 rounded-2xl bg-[#14B8A6]/10 text-[#0D9488] flex items-center justify-center font-black italic shadow-inner text-xl">01</div>
           <div>
             <h3 class="text-xl font-black text-slate-900 italic tracking-tight uppercase leading-none">Informasi Dasar</h3>
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2 opacity-60">Detail Utama Kursus</p>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 opacity-60">Detail Utama Kursus</p>
           </div>
         </div>
 
@@ -151,8 +156,8 @@
           <div class="flex items-center gap-4">
             <div class="w-12 h-12 rounded-2xl bg-[#14B8A6]/10 text-[#0D9488] flex items-center justify-center font-black italic shadow-inner text-xl">02</div>
             <div>
-              <h3 class="text-xl font-black text-slate-900 italic tracking-tight uppercase leading-none">Kurikulum & Materi</h3>
-              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2 opacity-60 italic">Upload & Urutan Video</p>
+              <h3 class="text-xl font-black text-slate-900 italic tracking-tight uppercase leading-none">Kurikulum & URL Materi</h3>
+              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 opacity-60 italic">Masukkan Link Video & Urutan</p>
             </div>
           </div>
           <button
@@ -175,21 +180,26 @@
 
                 <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
                   <div class="space-y-2">
-                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] px-1 opacity-60 italic">Judul Materi Video</label>
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] px-1 opacity-60 italic leading-none">Judul Materi</label>
                     <input
                       type="text"
                       bind:value={lesson.title}
-                      placeholder="Contoh: Pengenalan Dasar Svelte 5"
+                      placeholder="Contoh: Installasi & Pengenalan"
                       class="w-full bg-white border border-slate-100 rounded-xl p-3.5 text-xs font-black text-slate-700 outline-none focus:border-[#14B8A6] transition-all italic placeholder:font-medium"
                     />
                   </div>
-                  <div class="space-y-2">
-                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] px-1 opacity-60 italic leading-none">Video File (MP4/MKV)</label>
+                  <div class="space-y-2 relative">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] px-1 opacity-60 italic leading-none">Video URL (YouTube/Cloud)</label>
                     <div class="flex gap-3">
-                      <input
-                        type="file"
-                        class="flex-1 text-[10px] text-slate-400 file:bg-slate-900 file:text-white file:border-none file:rounded-lg file:px-4 file:py-2.5 file:mr-4 file:font-black file:uppercase file:text-[8px] file:cursor-pointer hover:file:bg-[#14B8A6] transition-all"
-                      />
+                      <div class="relative flex-1">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs opacity-30 italic">🔗</span>
+                        <input
+                          type="url"
+                          bind:value={lesson.url}
+                          placeholder="https://youtube.com/watch?v=..."
+                          class="w-full bg-white border border-slate-100 rounded-xl py-3.5 pl-8 pr-3 text-xs font-black text-[#14B8A6] outline-none focus:border-[#14B8A6] transition-all italic placeholder:font-medium"
+                        />
+                      </div>
                       <button
                         onclick={() => removeLesson(lesson.id)}
                         class="w-11 h-11 flex items-center justify-center bg-white border border-slate-100 text-slate-300 hover:text-rose-500 hover:border-rose-200 rounded-xl transition-all shadow-sm active:scale-90 cursor-pointer"
@@ -232,7 +242,7 @@
         <div class="space-y-4 pt-8 border-t border-slate-50 italic">
           <div class="flex justify-between items-center text-[10px]">
             <span class="text-slate-400 font-black uppercase tracking-widest opacity-60">Total Modul</span>
-            <span class="text-slate-900 font-black px-3 py-1 bg-slate-100 rounded-full italic">{lessons.length} Pelajaran</span>
+            <span class="text-slate-900 font-black px-3 py-1 bg-slate-100 rounded-full italic">{lessons.length} Modules</span>
           </div>
           <div class="flex justify-between items-center text-[10px]">
             <span class="text-slate-400 font-black uppercase tracking-widest opacity-60">Visibility</span>
@@ -245,7 +255,7 @@
         <div class="absolute -top-10 -right-10 w-32 h-32 bg-[#14B8A6]/20 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-700"></div>
         <div class="relative z-10 italic">
           <p class="text-[10px] font-black text-[#14B8A6] uppercase tracking-[0.3em] mb-4 opacity-80 leading-none">💡 Khwarizmi Tip</p>
-          <p class="text-sm text-slate-300 leading-relaxed font-medium italic opacity-90">"Pastikan judul materi video singkat namun jelas untuk memudahkan navigasi siswa di dalam Dashboard mereka."</p>
+          <p class="text-sm text-slate-300 leading-relaxed font-medium italic opacity-90">"Gunakan link dari YouTube (Unlisted) atau Vimeo untuk menghemat penyimpanan server internal Khwarizmi Academy."</p>
         </div>
       </div>
     </aside>
