@@ -6,6 +6,9 @@
   const courseId = $derived(page.params.id);
   let activeTab = $state("deskripsi");
 
+  // State untuk melacak video yang sudah selesai (ID)
+  let completedVideos = $state<number[]>([]);
+
   // Data Detail Kursus
   const courseDetail = {
     id: courseId,
@@ -17,59 +20,54 @@
     rating: 4.8,
   };
 
-  // Playlist: Menggunakan Video ID dari link yang Anda berikan
+  // Playlist: Menggunakan Video ID YouTube
   const playlist = [
-    {
-      id: 101,
-      title: "Introduction to Mobile Design",
-      duration: "10:45",
-      type: "video",
-      ytId: "VdYvSQZC1KI", // Diambil dari: https://youtu.be/VdYvSQZC1KI
-    },
-    {
-      id: 102,
-      title: "UI/UX Case Study Deep Dive",
-      duration: "15:20",
-      type: "video",
-      ytId: "jn06QvzBFUo", // Diambil dari: https://youtu.be/jn06QvzBFUo
-    },
-    {
-      id: 103,
-      title: "Advanced Figma Prototyping",
-      duration: "12:10",
-      type: "video",
-      ytId: "pHUUXIEyLnQ", // Diambil dari: https://youtu.be/pHUUXIEyLnQ
-    },
-    {
-      id: 104,
-      title: "Micro-interactions 101",
-      duration: "08:40",
-      type: "lock",
-      ytId: "",
-    },
+    { id: 101, title: "Introduction to Mobile Design", duration: "10:45", ytId: "VdYvSQZC1KI" },
+    { id: 102, title: "UI/UX Case Study Deep Dive", duration: "15:20", ytId: "jn06QvzBFUo" },
+    { id: 103, title: "Advanced Figma Prototyping", duration: "12:10", ytId: "pHUUXIEyLnQ" },
+    { id: 104, title: "Micro-interactions 101", duration: "08:40", ytId: "VdYvSQZC1KI" },
   ];
 
-  // Inisialisasi video pertama sebagai video yang sedang diputar
+  // Video yang sedang diputar
   let currentVideo = $state(playlist[0]);
+
+  // Derivasi Progress (%) secara reaktif
+  const progressPercent = $derived(playlist.length > 0 ? Math.round((completedVideos.length / playlist.length) * 100) : 0);
 
   // --- ACTIONS ---
   function playVideo(video: any) {
-    if (video.type === "lock") {
-      alert("Materi ini masih terkunci! Selesaikan materi sebelumnya.");
-      return;
-    }
     currentVideo = video;
     window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function toggleComplete(id: number) {
+    if (completedVideos.includes(id)) {
+      completedVideos = completedVideos.filter((vId) => vId !== id);
+    } else {
+      completedVideos = [...completedVideos, id];
+    }
   }
 </script>
 
 <div class="max-w-7xl mx-auto px-6 py-8 font-plus antialiased text-slate-800 mt-4">
-  <nav class="mb-8">
-    <a href="/user/courses" class="group flex items-center gap-2 text-slate-400 font-black text-[10px] uppercase tracking-widest transition-all hover:text-[#0D9488] italic">
-      <span class="text-base transition-transform group-hover:-translate-x-1">←</span>
-      Back to Katalog
-    </a>
-  </nav>
+  <div class="mb-10 bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm flex flex-col md:flex-row items-center gap-8">
+    <div class="flex-1 w-full">
+      <div class="flex justify-between items-end mb-4">
+        <div>
+          <h2 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 italic mb-1">Learning Progress</h2>
+          <p class="text-2xl font-black text-slate-900 italic uppercase tracking-tighter">{progressPercent}% Completed</p>
+        </div>
+        <div class="text-right">
+          <span class="text-[10px] font-black text-[#0D9488] bg-[#14B8A6]/10 px-4 py-1.5 rounded-full uppercase italic border border-[#14B8A6]/20">
+            {completedVideos.length} / {playlist.length} Lessons Done
+          </span>
+        </div>
+      </div>
+      <div class="h-4 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-50 shadow-inner">
+        <div class="h-full bg-gradient-to-r from-[#14B8A6] to-[#0D9488] transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(20,184,166,0.4)]" style="width: {progressPercent}%"></div>
+      </div>
+    </div>
+  </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-12 items-start">
     <div class="space-y-8">
@@ -87,15 +85,30 @@
       </div>
 
       <div class="space-y-6">
-        <div class="flex items-center gap-3">
-          <span class="px-3 py-1 bg-[#14B8A6]/10 text-[#0D9488] text-[9px] font-black rounded-full uppercase tracking-widest italic border border-[#14B8A6]/20">Active Lesson</span>
-          <span class="text-slate-300">/</span>
-          <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest italic">ID: KH-{currentVideo.id}</span>
-        </div>
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div class="space-y-2">
+            <div class="flex items-center gap-3">
+              <span class="px-3 py-1 bg-[#14B8A6]/10 text-[#0D9488] text-[9px] font-black rounded-full uppercase tracking-widest italic border border-[#14B8A6]/20">Active Lesson</span>
+              <span class="text-slate-300">/</span>
+              <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest italic">ID: KH-{currentVideo.id}</span>
+            </div>
+            <h1 class="text-4xl font-black text-slate-900 leading-tight italic uppercase tracking-tighter">
+              {currentVideo.title}
+            </h1>
+          </div>
 
-        <h1 class="text-4xl font-black text-slate-900 leading-tight italic uppercase tracking-tighter">
-          {currentVideo.title}
-        </h1>
+          <button
+            onclick={() => toggleComplete(currentVideo.id)}
+            class="shrink-0 flex items-center justify-center gap-3 px-8 py-4 rounded-[2rem] font-black text-[11px] uppercase tracking-[0.2em] transition-all italic shadow-xl active:scale-95
+            {completedVideos.includes(currentVideo.id) ? 'bg-emerald-500 text-white shadow-emerald-200' : 'bg-slate-900 text-white hover:bg-[#14B8A6] shadow-slate-200'}"
+          >
+            {#if completedVideos.includes(currentVideo.id)}
+              <span>✓ Selesai Menonton</span>
+            {:else}
+              <span>Tandai Selesai ➔</span>
+            {/if}
+          </button>
+        </div>
 
         <div class="flex flex-wrap items-center justify-between gap-6 pb-8 border-b border-slate-100">
           <div class="flex items-center gap-4">
@@ -136,33 +149,41 @@
                 "{courseDetail.description}"
               </p>
             {:else if activeTab === "materi-pendukung"}
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {#each playlist.filter((p) => p.type !== "lock") as extra}
-                  <div
-                    class="group flex items-center gap-4 p-4 bg-white rounded-[2rem] border border-slate-100 hover:border-[#14B8A6]/30 hover:shadow-xl hover:shadow-teal-900/5 transition-all cursor-pointer"
-                    onclick={() => playVideo(extra)}
-                  >
-                    <div class="w-10 h-10 shrink-0 bg-slate-50 rounded-xl flex items-center justify-center group-hover:bg-[#14B8A6] transition-colors">
-                      <span class="text-slate-400 group-hover:text-white text-[10px] font-black italic">PDF</span>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                      <h4 class="text-[11px] font-black text-slate-800 uppercase tracking-tight truncate italic">
-                        Asset: {extra.title}
-                      </h4>
-                      <span class="text-[9px] font-bold text-[#0D9488] uppercase tracking-widest opacity-70 italic">Download Materi ➔</span>
-                    </div>
-                  </div>
-                {/each}
-
-                <div class="group flex items-center gap-4 p-4 bg-[#F59E0B]/5 rounded-[2rem] border border-[#F59E0B]/10 hover:border-[#F59E0B]/30 hover:shadow-xl hover:shadow-orange-900/5 transition-all cursor-pointer">
-                  <div class="w-10 h-10 shrink-0 bg-[#F59E0B] rounded-xl flex items-center justify-center shadow-lg shadow-orange-200">
-                    <span class="text-white text-[10px] font-black italic">FIG</span>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="group flex items-center gap-5 p-5 bg-white rounded-[2.5rem] border border-slate-100 hover:border-[#14B8A6]/30 hover:shadow-xl hover:shadow-teal-900/5 transition-all">
+                  <div class="w-14 h-14 shrink-0 bg-rose-50 rounded-[1.5rem] flex items-center justify-center group-hover:bg-rose-500 transition-colors shadow-inner">
+                    <span class="text-rose-500 group-hover:text-white text-xs font-black italic uppercase">PDF</span>
                   </div>
                   <div class="flex-1 min-w-0">
-                    <h4 class="text-[11px] font-black text-slate-800 uppercase tracking-tight truncate italic">Figma Project File (.fig)</h4>
-                    <span class="text-[9px] font-bold text-[#F59E0B] uppercase tracking-widest italic">Source File ➔</span>
+                    <h4 class="text-[12px] font-black text-slate-800 uppercase tracking-tight truncate italic">E-Book: UI Design Mastery</h4>
+                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Format: PDF • 12.5 MB</p>
+                    <button class="text-[10px] font-black text-[#0D9488] uppercase tracking-widest mt-2 hover:underline">Download File ➔</button>
                   </div>
                 </div>
+
+                <div class="group flex items-center gap-5 p-5 bg-white rounded-[2.5rem] border border-slate-100 hover:border-[#14B8A6]/30 hover:shadow-xl hover:shadow-teal-900/5 transition-all">
+                  <div class="w-14 h-14 shrink-0 bg-amber-50 rounded-[1.5rem] flex items-center justify-center group-hover:bg-[#F59E0B] transition-colors shadow-inner">
+                    <span class="text-[#F59E0B] group-hover:text-white text-xs font-black italic uppercase">ZIP</span>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <h4 class="text-[12px] font-black text-slate-800 uppercase tracking-tight truncate italic">Project Assets Pack</h4>
+                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Icon, Font, & Images</p>
+                    <button class="text-[10px] font-black text-[#0D9488] uppercase tracking-widest mt-2 hover:underline">Download ZIP ➔</button>
+                  </div>
+                </div>
+
+                {#each playlist.slice(0, 1) as ref}
+                  <button class="group flex items-center gap-5 p-5 bg-[#14B8A6]/5 rounded-[2.5rem] border border-[#14B8A6]/10 hover:border-[#14B8A6] hover:shadow-xl transition-all text-left" onclick={() => playVideo(ref)}>
+                    <div class="w-14 h-14 shrink-0 bg-[#14B8A6] rounded-[1.5rem] flex items-center justify-center shadow-lg shadow-teal-100">
+                      <span class="text-white text-xs font-black italic uppercase">VID</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <h4 class="text-[12px] font-black text-slate-800 uppercase tracking-tight truncate italic">Ref: {ref.title}</h4>
+                      <p class="text-[9px] font-bold text-[#0D9488] uppercase tracking-widest mt-1">Video Tutorial Tambahan</p>
+                      <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-2 block">Klik untuk Putar ➔</span>
+                    </div>
+                  </button>
+                {/each}
               </div>
             {:else}
               <div class="bg-slate-50 rounded-[2.5rem] p-12 text-center border-2 border-dashed border-slate-200">
@@ -180,7 +201,7 @@
         <div class="p-8 border-b border-slate-50 flex items-center justify-between bg-slate-50/30">
           <h3 class="font-black text-slate-900 uppercase text-xs tracking-widest italic leading-none">Playlist Kursus</h3>
           <span class="px-4 py-1.5 bg-[#F59E0B] text-white text-[10px] font-black rounded-full italic shadow-lg shadow-orange-100">
-            {playlist.filter((p) => p.type !== "lock").length} / {playlist.length}
+            {completedVideos.length} / {playlist.length}
           </span>
         </div>
 
@@ -188,15 +209,18 @@
           {#each playlist as item, i}
             <button
               onclick={() => playVideo(item)}
-              class="w-full flex items-center gap-4 p-5 rounded-[2rem] transition-all group relative overflow-hidden
-              {currentVideo.id === item.id ? 'bg-[#14B8A6]/5 border border-[#14B8A6]/20' : 'hover:bg-slate-50 border border-transparent'}
-              {item.type === 'lock' ? 'opacity-40 grayscale cursor-not-allowed' : ''}"
+              class="w-full flex items-center gap-4 p-5 rounded-[2.5rem] transition-all group relative overflow-hidden
+              {currentVideo.id === item.id ? 'bg-[#14B8A6]/5 border border-[#14B8A6]/20' : 'hover:bg-slate-50 border border-transparent'}"
             >
               <div
                 class={`w-12 h-12 shrink-0 flex items-center justify-center rounded-2xl font-black text-sm transition-all italic shadow-sm
-                ${currentVideo.id === item.id ? "bg-[#14B8A6] text-white rotate-6" : "bg-white text-slate-400 group-hover:text-[#0D9488]"}`}
+                ${completedVideos.includes(item.id) ? "bg-emerald-100 text-emerald-600" : currentVideo.id === item.id ? "bg-[#14B8A6] text-white rotate-6" : "bg-white text-slate-400 group-hover:text-[#0D9488]"}`}
               >
-                {i + 1}
+                {#if completedVideos.includes(item.id)}
+                  ✓
+                {:else}
+                  {i + 1}
+                {/if}
               </div>
 
               <div class="flex-1 text-left min-w-0">
@@ -208,7 +232,7 @@
                 </span>
                 <div class="flex items-center gap-3">
                   <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest opacity-60">
-                    {item.type === "lock" ? "🔒 Locked" : `🕒 ${item.duration}`}
+                    🕒 {item.duration}
                   </span>
                 </div>
               </div>
