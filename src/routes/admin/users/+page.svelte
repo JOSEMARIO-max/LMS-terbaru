@@ -91,7 +91,7 @@
             id: Date.now(),
             ...newTask,
             status: "Pending",
-            attachment: selectedFile ? { name: selectedFile.name, type: fileType } : null,
+            attachment: selectedFile ? { name: selectedFile.name, type: fileType } : null, 
           },
           ...userTasks,
         ];
