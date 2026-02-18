@@ -1,43 +1,42 @@
-<script>
+<script lang="ts">
   import { onMount, onDestroy } from 'svelte';
   import { fade, fly } from 'svelte/transition';
+  import { cubicOut } from 'svelte/easing';
 
   export let isLoading = true;
 
   const messages = [
-    "Menyiapkan Kelas Digital...",
-    "Mengunduh Materi...",
-    "Menghubungkan Mentor...",
-    "Menyusun Algoritma...",
-    "Membuka Gerbang Ilmu...",
-    "Siap Belajar!"
+    "Memuat Aset...",
+    "Menyiapkan Kelas...",
+    "Sinkronisasi Data...",
+    "Hampir Siap..."
   ];
 
   let currentMessage = messages[0];
   let progress = 0;
-  let interval;
-  let textInterval;
-
-  // Partikel Matematika untuk Background (Agar tidak sepi)
-  const mathSymbols = ["∑", "π", "√", "∞", "∫", "x²", "≠", "≈", "∆", "%"];
+  let interval: any;
+  let textInterval: any;
 
   onMount(() => {
-    // 1. Progress Logic
+    // Progress Bar Logic (Smooth)
     interval = setInterval(() => {
-      progress += Math.random() * 6; // Sedikit lebih cepat
-      if (progress >= 100) {
+      // Logika agar cepat di awal, pelan di akhir
+      const remaining = 100 - progress;
+      progress += remaining * 0.1; // Tambah 10% dari sisa
+      
+      if (progress > 99.5) {
         progress = 100;
         clearInterval(interval);
-        setTimeout(() => { isLoading = false; }, 800);
+        setTimeout(() => { isLoading = false; }, 600);
       }
     }, 100);
 
-    // 2. Text Logic
+    // Text Rotation Logic
     let i = 0;
     textInterval = setInterval(() => {
       i = (i + 1) % messages.length;
       currentMessage = messages[i];
-    }, 1000);
+    }, 1500);
   });
 
   onDestroy(() => {
@@ -47,234 +46,183 @@
 </script>
 
 {#if isLoading}
-  <div class="loader-overlay" out:fade={{ duration: 600 }}>
+  <div class="loader-overlay" out:fade={{ duration: 500 }}>
     
-    <div class="bg-particles">
-      {#each mathSymbols as symbol, i}
-        <div 
-          class="particle" 
-          style="
-            top: {Math.random() * 100}%; 
-            left: {Math.random() * 100}%; 
-            animation-delay: {i * 0.5}s;
-            font-size: {Math.random() * 20 + 10}px;
-          "
-        >
-          {symbol}
-        </div>
-      {/each}
-    </div>
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
+    <div class="glass-surface"></div>
 
-    <div class="content-wrapper">
+    <div class="content">
       
-      <div class="orbit-system">
-        
-        <div class="ripple"></div>
-        <div class="ripple delay-1"></div>
-
-        <div class="nucleus-wrapper">
-            <img src="/logo.jpg" alt="Khwarizmi Logo" class="nucleus-logo" />
-        </div>
-
-        <div class="orbit orbit-1"></div>
-        <div class="orbit orbit-2"></div>
-        <div class="orbit orbit-3"></div>
-        
-        <div class="electron e-1"></div>
-        <div class="electron e-2"></div>
+      <div class="logo-container">
+        <div class="pulse-ring"></div>
+        <img src="/logo.jpg" alt="Khwarizmi Logo" class="logo" />
       </div>
 
-      <div class="text-area">
-        <h2 class="brand-name">KHWARIZMI <span class="highlight">ACADEMY</span></h2>
+      <div class="text-wrapper">
+        <h2 class="title">KHWARIZMI ACADEMY</h2>
         
-        <div class="msg-container">
+        <div class="message-box">
           {#key currentMessage}
-            <p class="loading-status" in:fly={{ y: 10, duration: 300 }}>
+            <span class="message" in:fly={{ y: 10, duration: 300, easing: cubicOut }}>
               {currentMessage}
-            </p>
+            </span>
           {/key}
         </div>
       </div>
 
-      <div class="progress-wrap">
-        <div class="progress-fill" style="width: {progress}%"></div>
+      <div class="progress-container">
+        <div class="progress-bar" style="width: {progress}%"></div>
       </div>
-      <div class="percentage">{Math.floor(progress)}%</div>
-
+      
+      <div class="percentage">{Math.round(progress)}%</div>
     </div>
+
   </div>
 {/if}
 
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap');
 
-  /* --- BASE OVERLAY --- */
+  /* LAYOUT UTAMA */
   .loader-overlay {
     position: fixed;
     inset: 0;
-    background: #ffffff; /* WHITE THEME */
-    z-index: 99999;
+    background: #fff7ed; /* Cream background (senada dengan login) */
+    z-index: 9999;
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
     font-family: 'Plus Jakarta Sans', sans-serif;
     overflow: hidden;
   }
 
-  /* --- BACKGROUND PARTICLES (BIAR GAK SEPI) --- */
-  .bg-particles {
+  /* BACKGROUND BLOBS (Modern Touch) */
+  .bg-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.6;
+    animation: floatBlob 10s infinite ease-in-out alternate;
+  }
+  .blob-1 {
+    width: 400px; height: 400px;
+    background: #fed7aa; /* Light Orange */
+    top: -10%; left: -10%;
+  }
+  .blob-2 {
+    width: 350px; height: 350px;
+    background: #ffedd5; /* Very Light Orange */
+    bottom: -10%; right: -10%;
+    animation-delay: -5s;
+  }
+  
+  /* Glass effect tipis di atas blob */
+  .glass-surface {
     position: absolute;
     inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    overflow: hidden;
+    backdrop-filter: blur(30px); /* Bikin blobnya makin halus menyatu */
   }
 
-  .particle {
-    position: absolute;
-    color: #cbd5e1; /* Abu-abu sangat muda */
-    font-weight: 800;
-    opacity: 0.4;
-    user-select: none;
-    animation: floatUp 10s linear infinite;
-  }
-
-  @keyframes floatUp {
-    0% { transform: translateY(100px) rotate(0deg); opacity: 0; }
-    50% { opacity: 0.6; }
-    100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
-  }
-
-  .content-wrapper {
+  /* CONTENT WRAPPER */
+  .content {
     position: relative;
     z-index: 10;
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 2rem;
+    width: 100%;
+    max-width: 300px;
   }
 
-  /* --- ORBIT SYSTEM --- */
-  .orbit-system {
-    width: 160px;
-    height: 160px;
+  /* LOGO STYLES */
+  .logo-container {
     position: relative;
-    margin-bottom: 40px;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
-  /* LOGO TENGAH */
-  .nucleus-wrapper {
+  .logo {
+    width: 80%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 20px; /* Rounded Box shape is more modern than circle sometimes */
+    box-shadow: 0 20px 40px -10px rgba(249, 115, 22, 0.2);
+    z-index: 2;
+  }
+
+  .pulse-ring {
     position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 70px; height: 70px;
-    z-index: 5;
-    /* Efek melayang */
-    animation: floatLogo 3s ease-in-out infinite; 
-  }
-
-  .nucleus-logo {
-    width: 100%; height: 100%;
-    object-fit: contain; /* Agar logo utuh */
-    /* Menghilangkan border dan diganti shadow halus */
-    filter: drop-shadow(0 10px 15px rgba(249, 115, 22, 0.3)); 
-  }
-
-  /* RIPPLE EFFECT (Gelombang Air) */
-  .ripple {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 60px; height: 60px;
-    border-radius: 50%;
-    background: rgba(249, 115, 22, 0.1);
+    inset: -5px;
+    border-radius: 24px;
+    border: 2px solid rgba(249, 115, 22, 0.1);
+    animation: pulse 2s infinite;
     z-index: 1;
-    animation: rippleAnim 2s linear infinite;
-  }
-  .delay-1 { animation-delay: 1s; }
-
-  /* GARIS ORBIT (Tipis & Elegan) */
-  .orbit {
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    border: 1px solid #e2e8f0; /* Abu-abu tipis */
   }
 
-  .orbit-1 { animation: spin 4s linear infinite; border-top: 2px solid #f97316; } /* Orange */
-  .orbit-2 { width: 120%; height: 120%; top: -10%; left: -10%; animation: spin 6s linear infinite reverse; border-right: 2px solid #3b82f6; opacity: 0.6; } /* Blue */
-  .orbit-3 { width: 80%; height: 80%; top: 10%; left: 10%; animation: spin 3s linear infinite; border-bottom: 2px solid #10b981; opacity: 0.4; } /* Green */
-
-  /* ELEKTRON */
-  .electron {
-    position: absolute;
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-  }
-  .e-1 { 
-    background: #f97316; 
-    box-shadow: 0 0 10px rgba(249,115,22,0.6);
-    animation: orbitPath 4s linear infinite; 
-    offset-path: path('M80,80 m-80,0 a80,80 0 1,0 160,0 a80,80 0 1,0 -160,0'); 
-  }
-  .e-2 { 
-    background: #3b82f6; 
-    box-shadow: 0 0 10px rgba(59,130,246,0.6);
-    animation: orbitPath 6s linear infinite reverse; 
-    offset-path: path('M96,96 m-96,0 a96,96 0 1,0 192,0 a96,96 0 1,0 -192,0'); 
+  /* TEXT STYLES */
+  .text-wrapper {
+    text-align: center;
   }
 
-  /* --- TEXT STYLES --- */
-  .text-area { text-align: center; margin-bottom: 20px; }
-  
-  .brand-name {
-    color: #0f172a; /* Warna gelap kontras */
-    font-size: 1.8rem;
+  .title {
+    font-size: 1.2rem;
     font-weight: 800;
-    letter-spacing: -0.5px;
-    margin: 0 0 5px 0;
+    letter-spacing: 0.05em;
+    color: #1e293b;
+    margin: 0;
+    margin-bottom: 0.25rem;
   }
-  .highlight { color: #f97316; }
 
-  .msg-container { height: 24px; overflow: hidden; }
-  .loading-status { color: #64748b; font-size: 0.95rem; font-weight: 500; margin: 0; }
+  .message-box {
+    height: 20px; /* Fixed height agar tidak lompat */
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
 
-  /* --- PROGRESS BAR --- */
-  .progress-wrap {
-    width: 250px;
+  .message {
+    font-size: 0.85rem;
+    color: #64748b;
+    font-weight: 500;
+  }
+
+  /* PROGRESS BAR (Minimalist) */
+  .progress-container {
+    width: 100%;
     height: 6px;
-    background: #f1f5f9; /* Abu-abu track */
+    background: #e2e8f0;
     border-radius: 10px;
     overflow: hidden;
-    margin-bottom: 8px;
   }
-  
-  .progress-fill {
+
+  .progress-bar {
     height: 100%;
-    background: linear-gradient(90deg, #f97316, #fb923c); /* Gradient Orange */
+    background: #f97316; /* Orange Brand */
     border-radius: 10px;
-    transition: width 0.1s linear;
-    box-shadow: 0 0 10px rgba(249, 115, 22, 0.3);
+    transition: width 0.3s ease-out;
   }
 
   .percentage {
-    font-size: 0.8rem;
-    color: #94a3b8;
+    font-size: 0.75rem;
     font-weight: 700;
+    color: #94a3b8;
+    margin-top: -1.5rem; /* Tarik ke atas sedikit dekat bar */
   }
 
-  /* --- ANIMATIONS --- */
-  @keyframes spin { 100% { transform: rotate(360deg); } }
-  @keyframes floatLogo { 0%, 100% { transform: translate(-50%, -50%) translateY(0); } 50% { transform: translate(-50%, -50%) translateY(-5px); } }
-  @keyframes rippleAnim {
-    0% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
-    100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+  /* ANIMATIONS */
+  @keyframes floatBlob {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(30px, 50px) scale(1.1); }
   }
 
-  /* Responsive */
-  @media (max-width: 480px) {
-    .orbit-system { transform: scale(0.8); }
-    .brand-name { font-size: 1.4rem; }
+  @keyframes pulse {
+    0% { transform: scale(0.95); opacity: 0.5; }
+    50% { transform: scale(1.15); opacity: 0; }
+    100% { transform: scale(0.95); opacity: 0; }
   }
 </style>
