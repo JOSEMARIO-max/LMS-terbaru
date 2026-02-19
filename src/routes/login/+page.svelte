@@ -5,25 +5,36 @@
   import { authStore } from "$lib/stores/auth-store.svelte";
   import toast, { Toaster } from "svelte-french-toast";
 
+  // --- SVELTE 5 RUNES (STATE) ---
   let email = $state("");
   let password = $state("");
   let isLoading = $state(false);
-  let loginStep = $state("form");
-  // Definisikan tipe yang valid
+  let showPassword = $state(false);
+  let loginStep = $state("form"); // value: "form" | "role"
+
+  // Definisikan tipe role yang valid untuk TypeScript
   type ValidRole = "admin" | "mentor" | "user";
 
-  // Beritahu TS bahwa array ini berisi ValidRole, bukan string biasa
+  // Array untuk merender pilihan role secara dinamis
   const availableRoles: ("admin" | "mentor" | "student")[] = ["admin", "mentor", "student"];
 
+  /**
+   * Menangani proses login utama ke Backend Laravel
+   */
   async function handleLogin(e: SubmitEvent) {
     e.preventDefault();
     isLoading = true;
+
     try {
+      // Panggil AuthService yang sudah terhubung dengan ApiClient
       const response = await AuthService.login({ email, password });
       isLoading = false;
+
+      // Jika user punya lebih dari 1 role, tampilkan pilihan role
       if (response.user.roles.length > 1) {
         loginStep = "role";
       } else {
+        // Jika hanya 1 role, langsung arahkan ke dashboard yang sesuai
         autoRedirect(response.user.roles[0]);
       }
     } catch (err: any) {
@@ -32,17 +43,27 @@
     }
   }
 
+  /**
+   * Logika pengalihan otomatis berdasarkan role
+   */
   function autoRedirect(role: string) {
     if (role === "admin") goto("/admin");
     else if (role === "mentor") goto("/mentor");
     else goto("/user");
   }
 
+  /**
+   * Navigasi manual saat user memilih role di UI
+   */
   function selectRole(role: ValidRole) {
     if (role === "admin") goto("/admin");
     else if (role === "mentor") goto("/mentor");
     else goto("/user");
   }
+
+  /**
+   * Membatalkan login dan membersihkan session
+   */
   function handleCancel() {
     AuthService.logout();
     loginStep = "form";
@@ -105,13 +126,29 @@
                 class="w-full px-5 py-3.5 sm:px-6 sm:py-4 rounded-full bg-slate-50 border border-slate-100 outline-none focus:border-orange-500 focus:bg-white focus:ring-4 focus:ring-orange-500/10 transition-all text-sm sm:text-base font-medium"
                 required
               />
-              <input
-                type="password"
-                placeholder="Password"
-                bind:value={password}
-                class="w-full px-5 py-3.5 sm:px-6 sm:py-4 rounded-full bg-slate-50 border border-slate-100 outline-none focus:border-orange-500 focus:bg-white focus:ring-4 focus:ring-orange-500/10 transition-all text-sm sm:text-base font-medium"
-                required
-              />
+
+              <div class="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  bind:value={password}
+                  class="w-full px-5 py-3.5 sm:px-6 sm:py-4 pr-14 sm:pr-16 rounded-full bg-slate-50 border border-slate-100 outline-none focus:border-orange-500 focus:bg-white focus:ring-4 focus:ring-orange-500/10 transition-all text-sm sm:text-base font-medium"
+                  required
+                />
+                <button type="button" onclick={() => (showPassword = !showPassword)} class="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-orange-500 transition-colors p-1">
+                  {#if showPassword}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                      ><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path><path
+                        d="M6.61 6.61A13.52 13.52 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"
+                      ></path><line x1="2" y1="2" x2="22" y2="22"></line></svg
+                    >
+                  {:else}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                      ><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg
+                    >
+                  {/if}
+                </button>
+              </div>
 
               <div class="text-right px-2">
                 <a href="/forgot" class="text-xs sm:text-sm font-bold text-orange-600 hover:text-orange-700 transition-colors">Lupa Password?</a>
@@ -120,7 +157,7 @@
               <button
                 type="submit"
                 disabled={isLoading}
-                class="w-full bg-orange-500 py-3.5 sm:py-4 rounded-full text-white font-black text-base sm:text-lg shadow-xl shadow-orange-200 hover:bg-orange-600 hover:-translate-y-1 active:scale-95 transition-all disabled:bg-slate-300 disabled:shadow-none"
+                class="w-full bg-orange-500 py-3.5 sm:py-4 rounded-full text-white font-black text-base sm:text-lg shadow-xl shadow-orange-200 hover:bg-orange-600 hover:-translate-y-1 active:scale-95 transition-all disabled:bg-slate-300"
               >
                 {isLoading ? "Processing..." : "Login Now"}
               </button>
@@ -155,7 +192,7 @@
               {#each availableRoles as r}
                 {#if authStore.hasRole(r)}
                   <button
-                    onclick={() => selectRole(r === "student" ? "user" : r)}
+                    onclick={() => selectRole(r === "student" ? "user" : (r as ValidRole))}
                     class="w-full group flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-2xl sm:rounded-3xl border-2 border-slate-100 hover:border-orange-500 hover:bg-orange-50 transition-all text-left"
                   >
                     <div class="h-10 w-10 sm:h-14 sm:w-14 rounded-xl sm:rounded-2xl bg-slate-100 flex items-center justify-center text-xl sm:text-2xl group-hover:bg-orange-500 transition-colors">
