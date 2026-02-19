@@ -34,6 +34,7 @@ class ApiClient {
         const { skipAuth = false, ...fetchOptions } = options;
 
         const body = (fetchOptions as RequestInit).body;
+        // Deteksi apakah body adalah FormData
         const isFormData = typeof FormData !== "undefined" && body instanceof FormData;
 
         const headers: HeadersInit = {
@@ -43,7 +44,8 @@ class ApiClient {
             ...fetchOptions.headers
         };
 
-        if (!isFormData) {
+        // Otomatis set Content-Type ke JSON jika BUKAN FormData
+        if (!isFormData && body !== undefined) {
             (headers as Record<string, string>)["Content-Type"] = "application/json";
         }
 
@@ -56,6 +58,7 @@ class ApiClient {
         try {
             const response = await fetch(`${this.baseUrl}${endpoint}`, finalOptions);
 
+            // 1. Handle Unauthorized (401)
             if (response.status === 401) {
                 authStore.clear();
                 goto("/login");
@@ -64,12 +67,12 @@ class ApiClient {
                 throw new UnauthorizedError(errorData.error, errorData);
             }
 
+            // 2. Handle Error Responses
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({
                     error: "Request failed"
                 }));
 
-                // Validation error (422) dengan details
                 if (response.status === 422 && errorData.details) {
                     throw new ValidationError(
                         errorData.error || "Validation failed",
@@ -89,15 +92,13 @@ class ApiClient {
                 );
             }
 
-            // Handle 204 No Content (DELETE response)
+            // 3. Handle 204 No Content (DELETE/PUT sukses tanpa body)
             const contentLength = response.headers.get("content-length");
             if (response.status === 204 || contentLength === "0") {
                 return null as T;
             }
 
-            // Return data langsung tanpa wrapper
-            const data: T = await response.json();
-            return data;
+            return await response.json();
         } catch (error) {
             if (error instanceof TypeError && error.message.includes("fetch")) {
                 throw new NetworkError(
@@ -113,13 +114,19 @@ class ApiClient {
         }
     }
 
-    async get<T = unknown>(
-        endpoint: string,
-        options: RequestOptions = {}
-    ): Promise<T> {
-        const { params, ...requestOptions } = options;
+    /**
+     * Helper untuk memproses body data (JSON vs FormData)
+     */
+    private serializeBody(data: any): BodyInit | undefined {
+        if (data === undefined || data === null) return undefined;
+        if (typeof FormData !== "undefined" && data instanceof FormData) return data;
+        return JSON.stringify(data);
+    }
 
+    async get<T = unknown>(endpoint: string, options: RequestOptions = {}): Promise<T> {
+        const { params, ...requestOptions } = options;
         let url = endpoint;
+        
         if (params) {
             const searchParams = new URLSearchParams();
             Object.entries(params).forEach(([key, value]) => {
@@ -140,7 +147,7 @@ class ApiClient {
         return this.request<T>(endpoint, {
             ...options,
             method: "POST",
-            body: data !== undefined ? JSON.stringify(data) : undefined
+            body: this.serializeBody(data)
         });
     }
 
@@ -148,7 +155,7 @@ class ApiClient {
         return this.request<T>(endpoint, {
             ...options,
             method: "PUT",
-            body: data !== undefined ? JSON.stringify(data) : undefined
+            body: this.serializeBody(data)
         });
     }
 
@@ -156,7 +163,7 @@ class ApiClient {
         return this.request<T>(endpoint, {
             ...options,
             method: "PATCH",
-            body: data !== undefined ? JSON.stringify(data) : undefined
+            body: this.serializeBody(data)
         });
     }
 
@@ -168,39 +175,7 @@ class ApiClient {
         endpoint: string,
         options: RequestOptions = {}
     ): Promise<PaginatedResponse<T>> {
-        const { params, ...requestOptions } = options;
-
-        let url = endpoint;
-        if (params) {
-            const searchParams = new URLSearchParams();
-            Object.entries(params).forEach(([key, value]) => {
-                if (value !== undefined && value !== null) {
-                    searchParams.append(key, String(value));
-                }
-            });
-            const queryString = searchParams.toString();
-            if (queryString) {
-                url += (endpoint.includes('?') ? '&' : '?') + queryString;
-            }
-        }
-
-        // getPaginated sudah return format {data, meta}
-        return this.request<PaginatedResponse<T>>(url, {
-            ...requestOptions,
-            method: "GET"
-        });
-    }
-
-    async upload<T = unknown>(
-        endpoint: string,
-        formData: FormData,
-        options: RequestOptions = {}
-    ): Promise<T> {
-        return this.request<T>(endpoint, {
-            ...options,
-            method: "POST",
-            body: formData
-        });
+        return this.get<PaginatedResponse<T>>(endpoint, options);
     }
 }
 
