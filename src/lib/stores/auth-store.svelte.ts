@@ -1,4 +1,5 @@
 import { browser } from '$app/environment';
+import type { User } from '$lib/types/user-type';
 
 const STORAGE_KEYS = {
     USER: 'auth:user',
@@ -78,6 +79,22 @@ class AuthStore {
     // Getters
     get isAuthenticated(): boolean {
         return !!this.user && !!this.token;
+    }
+    // Tambahkan di bagian Getters
+    get roles(): string[] {
+        return this.user?.roles ?? [];
+    }
+
+    get permissions(): string[] {
+        return this.user?.permissions ?? [];
+    }
+
+    hasRole(role: string): boolean {
+        return this.roles.includes(role);
+    }
+
+    hasAnyRole(roles: string[]): boolean {
+        return roles.some(r => this.roles.includes(r));
     }
 }
 

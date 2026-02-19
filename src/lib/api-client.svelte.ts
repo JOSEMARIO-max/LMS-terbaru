@@ -19,6 +19,7 @@ interface RequestOptions extends RequestInit {
 }
 
 class ApiClient {
+    isLoading = $state(false);
     private baseUrl: string;
 
     constructor(baseUrl: string = API_URL) {
@@ -31,6 +32,7 @@ class ApiClient {
     }
 
     async request<T = unknown>(endpoint: string, options: RequestOptions = {}): Promise<T> {
+        this.isLoading = true;
         const { skipAuth = false, ...fetchOptions } = options;
 
         const body = (fetchOptions as RequestInit).body;
@@ -73,10 +75,12 @@ class ApiClient {
                     error: "Request failed"
                 }));
 
-                if (response.status === 422 && errorData.details) {
+                if (response.status === 422) {
+                    // Laravel terkadang membungkusnya di 'errors' atau 'details'
+                    const validationDetails = errorData.errors || errorData.details;
                     throw new ValidationError(
-                        errorData.error || "Validation failed",
-                        errorData.details,
+                        errorData.message || "Input tidak valid",
+                        validationDetails,
                         errorData
                     );
                 }
@@ -111,6 +115,8 @@ class ApiClient {
             }
 
             throw new Error(error instanceof Error ? error.message : "Unknown error occurred");
+        } finally {
+            this.isLoading = true;
         }
     }
 
