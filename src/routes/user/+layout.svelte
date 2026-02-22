@@ -1,9 +1,9 @@
 <script lang="ts">
   import { page } from "$app/state";
   import { fade } from "svelte/transition";
-  import { user, isPremium } from "$lib/stores";
   import { onMount } from "svelte";
   import SidebarLink from "$lib/components/SidebarLink.svelte";
+  import { authStore } from "$lib/stores/auth-store.svelte"; // Pengganti stores.js
 
   // --- SVELTE 5 STATE ---
   let isSidebarOpen = $state(true);
@@ -23,6 +23,15 @@
     if (path === "/user/schedule") return "Jadwal Komunitas";
     return "Dashboard";
   });
+
+  // --- DATA USER DINAMIS DARI AUTH STORE ---
+  const userName = $derived(authStore.user?.name || "Student");
+
+  // Mengambil avatar dari tabel profile, fallback ke UI Avatars jika kosong
+  const userAvatar = $derived(authStore.user?.profile?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=0D8ABC&color=fff`);
+
+  // Status premium ditentukan dari role Spatie (misal punya role 'premium' atau 'pro')
+  const isPremiumUser = $derived(authStore.hasRole("premium") || authStore.hasRole("pro"));
 
   // --- LOGIC ---
   function toggleSidebar() {
@@ -95,12 +104,12 @@
       </div>
 
       <div class="p-4 border-t border-slate-100">
-        {#if $user && isSidebarOpen}
+        {#if authStore.isAuthenticated && isSidebarOpen}
           <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl mb-4" transition:fade>
-            <img src={$user.avatar || "https://ui-avatars.com/api/?name=User"} alt="User" class="w-9 h-9 rounded-xl object-cover" />
+            <img src={userAvatar} alt="User" class="w-9 h-9 rounded-xl object-cover" />
             <div class="flex flex-col min-w-0">
-              <span class="text-xs font-bold text-slate-800 truncate">{$user.name || "Student"}</span>
-              <span class="text-[9px] font-bold text-orange-500 uppercase tracking-tighter">{$isPremium ? "PRO Member" : "Free"}</span>
+              <span class="text-xs font-bold text-slate-800 truncate">{userName}</span>
+              <span class="text-[9px] font-bold text-orange-500 uppercase tracking-tighter">{isPremiumUser ? "PRO Member" : "Free"}</span>
             </div>
           </div>
         {/if}
@@ -140,13 +149,13 @@
           <div class="h-6 w-px bg-slate-200 mx-1"></div>
 
           <a href="/user/profile" class="flex items-center gap-3 p-1 pr-3 rounded-full border border-transparent hover:border-slate-200 hover:bg-white transition-all">
-            <img src={$user.avatar || "https://ui-avatars.com/api/?name=User"} class="w-8 h-8 rounded-full border-2 border-white shadow-sm object-cover" alt="User" />
+            <img src={userAvatar} class="w-8 h-8 rounded-full border-2 border-white shadow-sm object-cover" alt="User" />
             <div class="hidden sm:flex flex-col text-left">
               <span class="text-xs font-black text-slate-700 leading-none truncate max-w-[100px]">
-                {$user.name.split(" ")[0]}
+                {userName.split(" ")[0]}
               </span>
               <span class="text-[9px] font-bold text-kh-orange uppercase tracking-tighter">
-                {$isPremium ? "PRO Student" : "Free"}
+                {isPremiumUser ? "PRO Student" : "Free"}
               </span>
             </div>
           </a>

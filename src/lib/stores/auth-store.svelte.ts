@@ -85,9 +85,9 @@ class AuthStore {
         return this.user?.roles ?? [];
     }
 
-    get permissions(): string[] {
-        return this.user?.permissions ?? [];
-    }
+    // get permissions(): string[] {
+    //     return this.user?.permissions ?? [];
+    // }
 
     hasRole(role: string): boolean {
         return this.roles.includes(role);
