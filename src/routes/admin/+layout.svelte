@@ -112,15 +112,21 @@
       </div>
 
       <div class="flex items-center gap-4 lg:gap-8">
-        <div class="hidden md:flex flex-col text-right">
-          <p class="text-[11px] font-black text-slate-900 leading-none uppercase tracking-tighter italic">Luthfi Hakim</p>
-          <p class="text-[10px] font-bold text-emerald-500 uppercase mt-1 tracking-widest flex items-center justify-end gap-1">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
-            Online
-          </p>
-        </div>
-        <div class="w-12 h-12 rounded-[1.25rem] bg-slate-900 flex items-center justify-center font-black text-white shadow-xl shadow-slate-200 border-2 border-white group cursor-pointer hover:border-[#F59E0B] transition-colors">LH</div>
-      </div>
+  <div class="hidden md:flex flex-col text-right">
+    <p class="text-[11px] font-black text-slate-900 leading-none uppercase tracking-tighter italic">Luthfi Hakim</p>
+    <p class="text-[10px] font-bold text-emerald-500 uppercase mt-1 tracking-widest flex items-center justify-end gap-1">
+      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+      Online
+    </p>
+  </div>
+  
+  <a 
+    href="/admin/settings" 
+    class="w-12 h-12 rounded-[1.25rem] bg-slate-900 flex items-center justify-center font-black text-white shadow-xl shadow-slate-200 border-2 border-white group cursor-pointer hover:border-[#14B8A6] hover:scale-105 transition-all no-underline"
+  >
+    LH
+  </a>
+</div>
     </header>
 
     <div class="flex-1 overflow-y-auto px-8 lg:px-12 pb-12">
